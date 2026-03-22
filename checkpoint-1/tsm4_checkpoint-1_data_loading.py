@@ -66,10 +66,11 @@ def file_download(url, outputfile_path):
     r = requests.get(url, stream= True, timeout=120) #requests with s
     r.raise_for_status() # downloading status?
 
-    with open (outputfile_path, "wb") as f: # wb --> web binary
-        for chunk in r.iter_content(1024*1024): #
+    with open (outputfile_path, "wb") as f: # write in binary mode
+        for chunk in r.iter_content(1024*1024): #M chunkc  1024 by 1024 is std for avoding the downlaod the whole file into memory at once.
             if chunk:
-                f.write(chunk) # w
+                f.write(chunk) # writes each chuncks for file,skiiping empty chcunckc, so it saves the download piece by peice
+
 
 def extract_tab_sep_val(zip_path, output_dir):
     with zipfile.ZipFile(zip_path, "r") as zf:
@@ -97,7 +98,7 @@ def parse_num(x):
     if pd.isna(x):
         return np.nan # is it saying if x panda datframe isn't there return nan
     x = str(x)
-    x = re.sub(r"[<>=~]+", "", x) #regex
+    x = re.sub(r"[<>=~]+", "", x) #regex it removes any  <, > ,  = , ~ from the string.
     try:
         return float(x)
     except:
