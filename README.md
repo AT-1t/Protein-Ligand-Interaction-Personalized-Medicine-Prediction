@@ -14,13 +14,13 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
     •nohup python -u Tuba_Murphy_Upt_checkpoint_1_step_1.py > cp1_step_1_for_run.log 2>&1 & 
     OR
     •python Tuba_Murphy_Upt_checkpoint_1_step_1.py
+
     Data Directory:New_checkpoint_1_data_here
     File saved:
     checkpoint_1_step_1_kinase_filtered_data.csv
 
-    <Terminal> General Sanity Check
-    ![alt text](<Screenshot 2026-03-30 at 11.10.13 PM.png>)
-    
+### Terminal General Sanity Check
+![Terminal sanity check](images/sanity_check_ckp1_stp1.png)
 
 ## Checkpoint -1 Step -2 
 Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step_1_kinase_filtered_data.csv> and compares each protein sequence to reference kinase family sequences using Needleman Wunsh allignment to evaluate similairty. It calculates features like allignment score,normalized similarity, and closest kinase family for each protein.The output is a new dataset with these sequence based features added which will be used for machine learning in Checkpoint-1 step3 and checkpoint-2 step1.
@@ -32,11 +32,14 @@ Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step
     File saved:()
     checkpoint_1_step_2_alignment_features_data.csv
     checkpoint_1_kinase_reference_sequence_data.csv
-    <Terminal> General Sanity Check
-    ![alt text](<Screenshot 2026-03-30 at 11.16.35 PM.png)
 
-    <Terminal for Needleman Wunsch>
-    ![alt text](<Screenshot 2026-03-30 at 11.20.08 PM.png>)
+
+### Terminal General Sanity Check
+![Terminal sanity check](images/sanity_check_ckp1_st2_1.png)
+
+
+![Terminal sanity check](images/sanity_check_ckp1_stp2.png)
+
 
 
 
@@ -50,10 +53,12 @@ These ligand features are then combined with protein similarity features to crea
     Data Directory:New_checkpoint_1_data_here
     File saved:
     checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv
-    <Terminal>
-    ![alt text](<Screenshot 2026-03-30 at 11.28.58 PM.png>)
-    <Terminal>
-    ![alt text](<Screenshot 2026-03-30 at 11.29.59 PM.png>)
+
+### Terminal> General Sanity Check
+![Terminal sanity check](images/sanity_check_ckp1_stp3_1.png)
+
+![Terminal sanity check](images/sanity_check_ckp1_stp3_2.png)
+
 
 Data structure is correct, features complete,values are realistic,missining values minimal(1%) pipeline seems like working perfectly.
 
