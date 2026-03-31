@@ -7,7 +7,7 @@ We are going to use datasets such as BindingDB,UniProt,Protein Databank, and Che
 # Checkpoint-1
 Chuckpoint 1 creates the full pipeline for predicting protein ligand binding affinity.It starts by loading and filtering the dataset to only include kinase proteins.Then, protein and ligand features are generated separately.Finally, these features are combined into a machine learning model and evaluated using a cold start setup where EGFR is not inlcuded during training.
 
-## Checkpoint -1 Step -1 
+## Checkpoint-1  Step-1 
 Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein ligand ineractions data for many types of proteins and then filters it to keep only kinase related entries.Data gets loaded in smaller chunks so it doesn't overload ram.It cleans the data, selects important columns,convets binding values into usable format, and filters the dataset to keep only kinase related rows while marking EGFR for later testing.Finally, it combines all the prepared data and saves a clean kinase specific datset that will be used i the next steps for the project.
 
     
@@ -22,7 +22,9 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
 ### Terminal General Sanity Check
 ![Terminal sanity check](images/sanity_check_ckp1_stp1.png)
 
-## Checkpoint -1 Step -2 
+###### checkpoint_1_step_1_kinase_filtered_data.csv has 697,865 actual data rows.
+
+## Checkpoint-1  Step-2 
 Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step_1_kinase_filtered_data.csv> and compares each protein sequence to reference kinase family sequences using Needleman Wunsh allignment to evaluate similairty. It calculates features like allignment score,normalized similarity, and closest kinase family for each protein.The output is a new dataset with these sequence based features added which will be used for machine learning in Checkpoint-1 step3 and checkpoint-2 step1.
 
     •nohup python -u  Tuba_Murphy_chckp1_step_2_gitcopy.py > cp1_step_2_for_run.log 2>&1 &
@@ -43,7 +45,7 @@ Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step
 
 
 
-## Checkpoint -1 Step -3
+## Checkpoint-1  Step-3
 Checkpoint-1 step-3 takes dataset from step2 <checkpoint_1_step_2_alignment_features_data.csv> and converts SMILES strings into numerical features like molecular fingerprints and chemical properties ie.molecular weight, hydrophobicity.This crucial beacuse machine learning models cannot use raw SMILES strings, so we transform them into numbers that provides ligand structure and behavior.
 These ligand features are then combined with protein similarity features to create a final dataset that allows the model to learn and predict protein ligand binding affinity.
 
@@ -54,7 +56,7 @@ These ligand features are then combined with protein similarity features to crea
     File saved:
     checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv
 
-### Terminal> General Sanity Check
+### Terminal General Sanity Check
 ![Terminal sanity check](images/sanity_check_ckp1_stp3_1.png)
 
 ![Terminal sanity check](images/sanity_check_ckp1_stp3_2.png)
@@ -65,7 +67,7 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 
 
-## Checkpoint -1 Step -4
+## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
 cleans and prepares all features, and trains a KNN regression model to predict binding affinity.It trains the model only on non-EGFR proteins and then tests it on EGFR to evaluate how well it generalizes to unseen data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
 
@@ -86,4 +88,4 @@ cleans and prepares all features, and trains a KNN regression model to predict b
 ## Steps
 
 # Checkpoint -3 
-### Steps
+## Steps
