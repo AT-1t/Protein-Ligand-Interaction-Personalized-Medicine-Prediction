@@ -81,8 +81,9 @@ cleans and prepares all features, and trains a KNN regression model to predict b
     checkpoint_1_egfr_predictions_data.csv
     checkpoint_1_feature_importance_data.csv
 
-    ![Terminal sanity check](images/egfr_true_vs_pred.png)
-    ![Terminal sanity check](images/r2_value_curve.png)
+### Terminal General Sanity Check
+![Terminal sanity check](images/egfr_true_vs_pred.png)
+![Terminal sanity check](images/r2_value_curve.png)
 
 
 
