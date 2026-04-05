@@ -22,7 +22,7 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
 ### Terminal General Sanity Check
 ![Terminal sanity check](images/sanity_check_ckp1_stp1.png)
 
-###### checkpoint_1_step_1_kinase_filtered_data.csv has 697,865 actual data rows.
+#### checkpoint_1_step_1_kinase_filtered_data.csv has 697,865 actual data rows.
 
 ## Checkpoint-1  Step-2 
 Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step_1_kinase_filtered_data.csv> and compares each protein sequence to reference kinase family sequences using Needleman Wunsh allignment to evaluate similairty. It calculates features like allignment score,normalized similarity, and closest kinase family for each protein.The output is a new dataset with these sequence based features added which will be used for machine learning in Checkpoint-1 step3 and checkpoint-2 step1.
@@ -80,6 +80,10 @@ cleans and prepares all features, and trains a KNN regression model to predict b
     checkpoint_1_scaler_data.pkl
     checkpoint_1_egfr_predictions_data.csv
     checkpoint_1_feature_importance_data.csv
+
+    ![Terminal sanity check](images/egfr_true_vs_pred.png)
+    ![Terminal sanity check](images/r2_value_curve.png)
+
 
 
 
