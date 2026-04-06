@@ -69,14 +69,13 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 ## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
-cleans and prepares all features, and trains a KNN regression model to predict binding affinity.It trains the model only on non-EGFR proteins and then tests it on EGFR to evaluate how well it generalizes to unseen data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
+cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the model only on non-EGFR proteins and then tests it on EGFR to evaluate how well it generalizes to unseen data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
 
     •nohup python -u  Tuba_Murphy_updated_checkpoint_1_step4.py > cp1_step_2_for_run.log 2>&1 &
     OR
     •python Tuba_Murphy_updated_checkpoint_1_step4.py
     Data Directory:New_checkpoint_1_data_here
     File saved:
-    checkpoint_1_step4_knn_model_dat_.pkl
     checkpoint_1_scaler_data.pkl
     checkpoint_1_egfr_predictions_data.csv
     checkpoint_1_feature_importance_data.csv
