@@ -89,7 +89,59 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
 
 # Checkpoint-2 
 
-## Steps
+## Checkpoint-1  Step-3
+Checkpoint-2 Step 3 takes the dataset produced from the previous step <checkpoint_2_step_2_deepseq_embedding.csv> and prepares it for protein classification processes. The goal of this step is to create a clean, protein-level feature table that can be used for machine learning while also visualizing relationships between proteins.
+First, data is cleaned via removing rows with missing or invalid kinase family labels and standardizing the label formatting. Then, non-feature columns such as identifiers, sequences, and raw metadata are removed so that there are only numerical features remaining.
+All feature columns are converted to numeric values, and missing or infinite values are handled in order to ensure compatibility with machine learning models. Next, duplicate protein entries are collapsed by grouping on identifiers such as UniProt ID and kinase family. This also ensures that each protein is being represented by a single row, helping to prevent any biase caused by a ligand having repeated entries.
+Adter building the final protein-level dataset, a dendrogram (hierarchical clustering tree) is generated using Euclidean distance and Ward linkage. The visualization helps to show how proteins might cluster based on their sequeunce-derived and embedding featurrs. This would provide more insight into protein family relationships.
+The final output is a cleaned and reduced dataset along with the saved visualization of protein clusters, which will be used as input for Step 4
+
+    •nohup python -u checkpoint_2_step_3.py > checkpoinr2_step3_run.log 2>&1 & 
+    OR
+    •python checkpoint_2_step_3.py
+
+    Data Directory: Checkpoint_2_data
+    File saved:
+    checkpoint_2_step_3_family_classification.csv
+    checkpoint_2_step_3_family_tree.png
+### Terminal General Sanity Check
+
+
+
+## Checkpoint-1  Step-4
+Checkpoint-2 Step 4 trains a machine learning model to predict the protein kinase family using the dataset generated in step 3 <checkpoint_2_step_3_family_classification.csv>. This step feocuses on evaluating how well the model can generalize to unseen proteins in a cold-start setting.
+The dataset is first loaded and validated to make sure that the necessary information is present from the step 3 output, such as required labels and features. 
+A cold-start evaluation strategy is applied by splitting the data based on protein identity. Specifically, EGFR proteins are excluded from training and used only for testing. This is ensuring that the model is evaluated on proteins it has not seen before.
+Feature columns are separated from the metadata, and all of the values are converted to numeric format with missing values handled appropriately. The target variable, kinase family, is encoded into numerical labels for model training. A Random Forest Classifier is trained using class-balanced weighting to account for a vast difference in family sizes and the model then predicts protein family labels on the unseen test set of EGFR prteins. Model performance is being evaluated using Accuracy, Macro F1 Score, Weighted F1 Score, and a Confusion Matrix.
+Additional visualizations have been generated to help better understand the behavior of the mode;. This includes the following:
+Confusion Matrix (saved as PNG)
+Feature Importance Plot (top 20-30 contributing features)
+Performance Metrics Bar Chart
+Prediction Correctness Breakdown
+Prediction Confidence Distribution
+
+These outputs are able to help analyze the features that are contributing to classification while also showing how well the model is generalizing under the cold-starting conditions.
+
+    •nohup python -u checkpoint_2_step_4.py > checkpoinr2_step4_run.log 2>&1 & 
+    OR
+    •python checkpoint_2_step_4.py
+
+    Data Directory: Checkpoint_2_data
+    File saved:
+    checkpoint_2_step_4_transfer_learning_family_predictions.csv
+    checkpoint_2_step_4_family_classification_metrics.csv
+    checkpoint_2_step_4_family_classification_confusion_matrix.csv
+    checkpoint_2_step_4_feature_importance.csv
+
+    Some Addition Visual Outputs:
+    checkpoint_2_step_4_confusion_matrix.png
+    checkpoint_2_step_4_feature_importance.png
+    checkpoint_2_step_4_metrics.png
+    checkpoint_2_step_4_cvsi.png
+    checkpoint_2_step_4_conhist.png
+
+### Terminal General Sanity Check
+
 
 # Checkpoint -3 
 ## Steps
