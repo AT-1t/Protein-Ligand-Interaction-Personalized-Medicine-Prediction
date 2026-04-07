@@ -59,9 +59,12 @@ def download_file(url:str, outputfile_path:str) -> None:
     #Bindingdb zip file(Binary format) -->extract to tsv(text-tab seprated values) -->pandas -->sequences
     with open(outputfile_path, "wb") as f:
         #this line reads the file in chunksof 1MB for 1024 by 1024 bites.
-        for chunk in response.iter_content(1024*1024):
-            if chunk:
-                f.write(chunk)
+        for _ in map(lambda chunk: f.write(chunk) if chunk else None, response.iter_content(1024 * 1024)):
+            pass          
+
+        # may caused the memory crash 
+        # list(map(lambda chunk: f.write(chunk) if chunk else None, response.iter_content(1024 * 1024)))
+
     #this is looping perpeously to read the lines in chunks it doesn't dump the data all at once.
 
 def extract_tab_sep_val(zip_path: str, output_dir: str) -> str:
@@ -160,9 +163,7 @@ def columns_selections(df: pd.DataFrame) ->pd.DataFrame:
         ],
     }
 
-    found_mapping_pos = {}
-    for new_name, proteins in mapping_pos_proteins.items():
-        found_mapping_pos[new_name] = column_finder(columns, proteins)
+    found_mapping_pos = dict(map(lambda item:(item[0],column_finder(columns,item[1])), mapping_pos_proteins.items()))
     print("Columns found in mapping:", found_mapping_pos)
     
     #v -> value orginal name id bingindb dataset k is cleaned name 
@@ -175,9 +176,7 @@ def columns_selections(df: pd.DataFrame) ->pd.DataFrame:
     
     df = df[list(rev_mapping.keys())].rename(columns=rev_mapping)
     
-    for c in ["ki", "kd", "ic50"]:
-        if c in df.columns:
-            df[c] = df[c].apply(parse_number)
+    list(map(lambda c: df.__setitem__(c, df[c].apply(parse_number)) if c in df.columns else None, ["ki", "kd", "ic50"]))
 
     if "uniprot_id" in df.columns:
         df["uniprot_id"] = df["uniprot_id"].astype(str).str.strip().str.upper()
@@ -186,10 +185,8 @@ def columns_selections(df: pd.DataFrame) ->pd.DataFrame:
 #this is ging to check ki,kd ic50 values and return it if it exist.
 #it picks whiever is availabe to represent binding affinity
 def affinity_val(row):
-    for c in ["kd", "ki", "ic50"]:
-        if c in row.index and pd.notna(row[c]):
-            return row[c]
-    return np.nan #np.nan workds better with pandas then just None.
+    return next(map(lambda c: row[c], filter(lambda c: c in row.index and pd.notna(row[c]), ["kd", "ki", "ic50"])), np.nan)
+  #np.nan workds better with pandas then just None.
 #Ki:inhibition constant  lower ki stonger bining better ingibitor
 #Kd: dissociation constant measure ligand bining lower kd tigheter bingind
 #IC50: half maximal  inhibitory concetration, concentration needed to reduce activity by 50%
@@ -230,9 +227,7 @@ def rows_clean_up(df: pd.DataFrame) -> pd.DataFrame:
     required_cols = [c for c in ["target_name", "smiles", "sequence"] if c in df.columns]
     df = df.dropna(subset=required_cols).copy() #removes Nan values
 
-    for c in ["target_name", "smiles", "sequence"]:
-        if c in df.columns:
-            df[c] = df[c].astype(str).str.strip() #removes extra spaces
+    list(map(lambda c: df.__setitem__(c, df[c].astype(str).str.strip()) if c in df.columns else None, ["target_name", "smiles", "sequence"])) #removes extra spaces
     df = df[df["target_name"] != ""] #removes empty strings from the target name column
     df = df[df["smiles"] != ""]
     df = df[df["sequence"] != ""]#removes empty strings from the sequence column
@@ -246,19 +241,20 @@ def process_chunks(chunk: pd.DataFrame) -> pd.DataFrame:
     chunk= kinase_and_egfr_rows_indata(chunk)
     return chunk
 
+def safely_process_chunks(chunk):
+    try:
+        processed = process_chunks(chunk)
+        return processed if not processed.empty else None
+    except Exception as e:
+        print("Chunks skipped data due to error", e)
+        return None
 def chunkloading(path: str) -> pd.DataFrame:
-    chunks_output = []
+    #chunks_output = []
     #CSV is better than ppickle now 
     #needleman wunsch and smith waterman needs the actual sequences 
     #I keep adding bew features and I have to be able to read the ouput to be able to debug.
-    for chunk in tqdm(pd.read_csv(path, sep="\t", chunksize=CHUNKSIZE)):
-        #tqdm progress bar to see the work in terminal
-        try:
-            processed = process_chunks(chunk)
-            if not processed.empty:
-                chunks_output.append(processed) #each chunk adds into a list,we are using panda concat it is fast
-        except Exception as e:
-            print("Chucks skipped data due to error", e)
+    #tqdm progress bar to see the work in terminal
+    chunks_output = list(filter(lambda x: x is not None, map(lambda chunk: safely_process_chunks(chunk), tqdm(pd.read_csv(path, sep="\t", chunksize=CHUNKSIZE)))))
     if not chunks_output:
             print("Warning: no data after filering.") #hope not
             return pd.DataFrame()

@@ -109,18 +109,15 @@ def get_fam_ref_seq(df):
     else:
         valid_fam = valid_fam.head(max_reference_families).copy() #from valid cases take top N
     
-    reference_rows = []
-
-    for fam in valid_fam["kinase_family"].tolist():
-        fam_df = non_egfr_df[non_egfr_df["kinase_family"] == fam].copy()
-
+    def build_reference_row(fam):
+        fam_df = non_egfr_df[non_egfr_df["kinase_family"] ==fam].copy()
         if fam_df.empty:
-            continue
-        #it chooses the longest clean sequence in each family reference
+            return None
         fam_df["seq_len"] = fam_df["sequence"].str.len()
         ref_row = fam_df.sort_values("seq_len", ascending=False).iloc[0]
 
-        reference_rows.append({
+
+        return {
             "kinase_family": fam,
             "reference_sequence": ref_row["sequence"],
             "reference_length": len(ref_row["sequence"]),
@@ -128,14 +125,30 @@ def get_fam_ref_seq(df):
             "reference_uniprot_id": ref_row["uniprot_id"] if "uniprot_id" in ref_row.index else np.nan,
             "reference_target_name" :ref_row["target_name"] if "target_name" in ref_row.index else np.nan,
 
-        })
+        }
+    
+    reference_rows = list(
+        filter(None, map(build_reference_row, valid_fam["kinase_family"].tolist()))
+    )
 
-    reference_data_df =pd.DataFrame(reference_rows)
+    reference_data_df = pd.DataFrame(reference_rows)
 
     if reference_data_df.empty:
         raise ValueError("No kinase family reference sequences could be built")
-        
-    return reference_data_df
+    return reference_data_df                                
+
+"""
+    for fam in valid_fam["kinase_family"].tolist():
+        fam_df = non_egfr_df[non_egfr_df["kinase_family"] == fam].copy()
+
+        if fam_df.empty:
+            continue
+        #it chooses the longest clean sequence in each family reference
+        fam_df["seq_len"] = fam_df["sequence"].str.len()
+        ref_row = fam_df.sort_values("seq_len", ascending=False).iloc[0]"""
+
+
+   
 def aligner_build():
     aligner = PairwiseAligner()
     #global allignment from beginig to end not just best matching parts.
@@ -193,22 +206,23 @@ def execute_fam_panel_features(query_sequence, reference_data_df,aligner):
             "mean_sequence_similarity":np.nan,
             "family_reference_count":np.nan
         }
-    scores_list = []
     
-    #Goes through each rough in the dataframe and for each row use its data (ref seq) to make alignment comparison.
-    for _, row in reference_data_df.iterrows(): #_ index in each ro in the dataframe
-        align_raw_score, normalized_score, prefix_similarity = execute_alignment_features(
+    def compute_score(row):
+        align_raw_score, normalized_score, prefix_similarity =execute_alignment_features(
             row["reference_sequence"], query_sequence, aligner
+
         )
-        
-        scores_list.append({
+        return {
             "kinase_family": row["kinase_family"],
             "raw_score": align_raw_score,
             "normalized_score": normalized_score,
             "prefix_similarity": prefix_similarity,
-        })
-
-    scores_list_df = pd.DataFrame(scores_list).dropna()
+        }
+        
+    scores_list_df = pd.DataFrame(
+        list(map(compute_score, reference_data_df.to_dict("records")))
+    ).dropna()
+  
 
     if scores_list_df.empty:
         return {
@@ -248,6 +262,8 @@ def execute_fam_panel_features(query_sequence, reference_data_df,aligner):
 # =======
 
 def main():
+    os.makedirs(Data_directory, exist_ok=True)
+    
     if not os.path.exists(Checkpoint_1_step_1_input_path):
         print("Step-1 file is not found", Checkpoint_1_step_1_input_path)
         return
