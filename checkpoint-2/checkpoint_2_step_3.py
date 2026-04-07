@@ -1,146 +1,148 @@
-#Checkpoont-2 Step 3
+#Checkpoint-2 Step 3
+
+#importing the necessary libraries
 import os
-import pandas as pd
-import warnings 
-
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import classification_report, accuracy_score, f1_score, confusion_matrix
-warnings.filterwarnings("ignore")
+import warnings
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+warnings.filterwarnings("ignore")
+from scipy.spatial.distance import pdist
+from scipy.cluster.hierarchy import linkage, dendrogram
 
-#Setting Up The Directories
+#Setting up directory, input and output
 Data_directory = "Checkpoint_2_data"
-Checkpoint_2_step_3_input_path = os.path.join(Data_directory,"checkpoint_2_step_2_deepseq_embedding.csv")
-Checkpoint_2_step_3_output_path = os.path.join(Data_directory, "checkpoint_2_step_3_family_classification.csv")
-
-#Function for Building a Numeric Feature Table
-def building_nfeature_table(df):
-
-    non_feature_columns = ["target_name", "smiles", "uniprot_id", "sequence", "sequence_clean", "closest_kinase_family", "affinity", "log_affinity"]
-    if "is_egfr" in df.columns:
-        non_feature_columns.append("is_egfr")
-    feature_cols = [c for c in df.columns if c not in non_feature_columns]
-    X_df = df[feature_cols].copy()
-    #to numeric
-    for c in X_df.columns:
-        X_df[c] = pd.to_numeric(X_df[c], errors="coerce")
-    all_nan_columns = X_df.columns[X_df.isna().all()].tolist()
-    #taking care of nan columns and inf
-    if all_nan_columns:
-        print("Dropping all NaN columns:", all_nan_columns)
-        X_df = X_df.drop(columns=all_nan_columns)
-    X_df = X_df.replace([np.inf, -np.inf], np.nan)
-    #filling missing with median(??)
-    X_df = X_df.fillna(X_df.median(numeric_only=True))
-    #dropping any other icky columns though
-    icky_columns = X_df.columns[X_df.isna().any()].tolist()
-    if icky_columns:
-        print("Dropping Columns", icky_columns)
-        X_df = X_df.drop(columns=icky_columns)
-    feature_cols = X_df.columns.tolist()
-    return X_df, feature_cols
+Checkpoint_2_step_3_input_path = os.path.join(Data_directory,"checkpoint_2_step_2_deepseq_embedding.csv") #input data  is output data from checkpoint 2 step 2
+Checkpoint_2_step_3_output_path = os.path.join(Data_directory, "checkpoint_2_step_3_family_classification.csv") #output data
+Checkpoint_2_step_3_family_plot = os.path.join(Data_directory, "checkpoint_2_family_tree_plot.png") #plot of family trees for visualization
 
 def main():
-
+    #File Validations and Reading
+    #============================================
+    #Checking that input file actually exists
     if not os.path.exists(Checkpoint_2_step_3_input_path):
-        print("No Step 2 Embeddings File Found - Run Step 2!!")
-        return
-    #Loading Embedding Data - with column check
-    dataframe = pd.read_csv(Checkpoint_2_step_3_input_path)
-    print("Loaded Embeddings:", dataframe.shape)
-    #Dataframe empty check
-    if dataframe.empty:
-        print("The Input File is EMPTY!")
-        return
-    #column check for closest kinase family
-    if "closest_kinase_family" not in dataframe.columns:
-        raise ValueError("Step 2 output is missing closest_kinase_column!")
-    #checking for missing required columns
-    target_columns = ["closest_kinase_family"]
-    cols = [c for c in target_columns if c not in dataframe.columns]
-    if cols:
-        print("You are MISSING REQUIRED COLUMNS!")
+        print("NO Step 3 Input File Was Found!")
         return
     
-    #removing rows with missing family labels
-    dataframe = dataframe.dropna(subset=["closest_kinase_family"]).copy()
-    dataframe["closest_kinase_family"] = dataframe["closest_kinase_family"].astype(str).str.strip()
-
-    #removing any blank labels
-    dataframe = dataframe[dataframe["closest_kinase_family"] != ""].copy()
-    if dataframe.empty:
-        print("no valid family labels!")
+    #Reading input file
+    df = pd.read_csv(Checkpoint_2_step_3_input_path)
+    print("Data Loaded")
+    #Making sure input file is not empty (there is data present)
+    if df.empty:
+        print("Step 3 Input File is Empty!")
+        return
+    #Checking that the label column is present for analysis
+    if "closest_kinase_family" not in df.columns:
+        raise ValueError("Missing Required Column! - closest_kinase_family")
+    
+    #Some File Housekeeping
+    #===========================================
+    #removing rows where the protein family label might be missing
+    df = df.dropna(subset=["closest_kinase_family"]).copy()
+    #converting the family label column to string type and removing any trailing or leading for consistency
+    df["closest_kinase_family"] = df["closest_kinase_family"].astype(str).str.strip()
+    #removes rows where the family label is empty after cleaning (handling blanks or spaces)
+    df = df[df["closest_kinase_family"] != ""].copy()
+    #checking is df is empty after housekeeping processes
+    if df.empty:
+        print("No good family labels present")
         return
     
-    #Building a Numeric Feature Table
-    X_df, feature_columns = building_nfeature_table(dataframe)
-    print("Useable Feature Count", len(feature_columns))
+    #Data Preparations
+    #=================================================
+    #list of non feature columns - these should not be used as model features
+    non_feature_columns = ["target_name", "smiles", "sequence", "sequence_clean", "uniprot_id", "closest_kinase_family", "affinity", "log_affinity", "is_egfr"]
+    #list of feature columns - alignment and embedding selection
+    embedding_columns = [c for c in df.columns if c.startswith("emb_")]
+    aa_columns = [c for c in df.columns if c.startswith("aa_")]
 
-    dataframe = dataframe.loc[X_df.index].copy()
-    df_model = dataframe.copy()
-    df_model[feature_columns] = X_df.copy()
+    phychem_columns = [
+        "seq_length", 
+        "mean_hydrophobicity", 
+        "mean_molecular_weight",
+        "mean_polarity", 
+        "net_charge",
+        "mean_volume",
+        "hydrophobic_ratio",
+        "polar_ratio",
+        "charged_ratio"
+    ]
 
-    if df_model["closest_kinase_family"].nunique() < 2:
-        print("Please have at least 2 families for classification!!")
-        return
+    similarity_columns = [
+        "needleman_wunsch_score",
+        "normalized_nw_score",
+        "sequence_similarity",
+        "mean_nw_score",
+        "mean_normalized_nw_score",
+        "mean_sequence_similarity",
+        "family_reference_count"
+    ]
+
+    assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"] #not great for cold-start so considering removing!!!!
     
-    #removing rare cases??? possibly implement this but see how model behaves now
-    if df_model["closest_kinase_family"].nunique() < 2:
-        print("Please have at least 2 families for classification!!")
-        return
+    feature_columns = embedding_columns + aa_columns + phychem_columns + similarity_columns + assay_columns
+    #creating a feature matrix from the selected feature columns
+    X_df = df[feature_columns].copy()
 
+    #converting all features to numeric
+    X_df = X_df.apply(pd.to_numeric, errors="coerce")
+    #dropping columns that are entirely NaN and are not useful
+    X_df = X_df.dropna(axis=1, how="all")
+    #replacing any infinite values with NaN
+    X_df = X_df.replace([np.inf, -np.inf], np.nan)
+    #filling any columns with NaN, median
+    X_df = X_df.fillna(X_df.median(numeric_only=True))
+    #printing the number of usable features
+    print("Feature Count:", X_df.shape[1])
+
+    #Grouping of duplicate protein rows if protein ids exist
+    #=======================================================
+    #columns that define the protein identity - metadata for grouping together                       
+    group_columns = [c for c in ["target_name", "uniprot_id", "closest_kinase_family", "is_egfr"] if c in df.columns]
+    #metadata columns that are being kept alongside averaged numeric features
+    meta_columns = group_columns
+    #combining metadata with cleaned numeric features
+    no_repeat_df = pd.concat([df[meta_columns].reset_index(drop=True), X_df.reset_index(drop=True)], axis=1)
+    #reducing duplicate proteins by averaging numeric features, grouped by group_columns
+    end_df = (no_repeat_df.groupby(group_columns, dropna=False).mean(numeric_only=True).reset_index())
+    print("After reducing duplicated proteins", end_df.shape)
+    #saving output to csv for Step 4
+    end_df.to_csv(Checkpoint_2_step_3_output_path, index=False)
+
+
+    #Preparation for Dendrogram Visualization
+    #===========================================
+    #selecting label columns useful for plotting
+    label_columns = [c for c in ["target_name", "uniprot_id", "closest_kinase_family"] if c in end_df.columns]
     
-    #Setting up Data for Model
-    y = df_model["closest_kinase_family"].copy()
-    X = df_model[feature_columns].copy()
-
-    print("Label is Features?", "closest_kinase_family" in X.columns)
-    label_encoder = LabelEncoder()
-    y_encoded = label_encoder.fit_transform(y)
-
-
-
-    X_train, X_test, y_train, y_test, train_idx, test_idx  = train_test_split(X, y_encoded, df_model.index, test_size=0.2, random_state=42, stratify=y_encoded)
-                                                         
-
-    rf_model = RandomForestClassifier(n_estimators=100, max_depth=None, n_jobs=-1, random_state=42, class_weight="balanced")
-    rf_model.fit(X_train, y_train)
-
-    y_pred = rf_model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average="macro")
-    f1_weighted = f1_score(y_test, y_pred, average="weighted")
-
-
-    print("Step3 Accuracy:", accuracy)
-    print("Step3 F1 MACRO:", f1)
-    print("Step3 F1 WEIGHTED:", f1_weighted)
-
-
-    #predictions table
-
-    results = df_model.loc[test_idx].copy()
-    results["true_family"] = label_encoder.inverse_transform(y_test)
-    results["predicted_family"] = label_encoder.inverse_transform(y_pred)
-    results["prediction_correct"] = (results["true_family"] == results["predicted_family"])
-
-    results.to_csv(Checkpoint_2_step_3_output_path, index=False)
-    print("Step 3 Predictions Have Been Saved!")
-
-    metrics_df = pd.DataFrame({"metric": ["accuracy", "f1", "f1_weighted", "n_train", "n_test", "n_features"], 
-                               "value": [accuracy, f1, f1_weighted, len(X_train), len(X_test), len(feature_columns)]})
-
-    print(metrics_df)
-
-    #confusion matrix
-    class_names = label_encoder.classes_
-    cm = confusion_matrix(y_test, y_pred)
-    cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
-    print(cm_df)
-
-    print("Step 3 has Completed - Pursue Step 4!")
+    #Creating labels for each leaf with family and protein id if id exists
+    if "uniprot_id" in end_df.columns:
+        labels = (end_df["closest_kinase_family"].astype(str) + " | " + end_df["uniprot_id"].astype(str)).tolist()
+    else:
+        #if not use family names
+        labels = end_df["closest_kinase_family"].astype(str).tolist()
     
+    #Generating the Dendrogram
+    #===================================================================
+    plt.figure(figsize=(10,10))
+    #selecting numeric feature columns for clustering
+    num_columns = [c for c in end_df.columns if c not in label_columns]
+    num_columns = [c for c in num_columns if c != "is_egfr"]
+    #converting feature table to numpy array
+    X_plot = end_df[num_columns].values
+    #Performing hierarchical clustering
+    z = linkage(X_plot, method="ward")
+
+    #Plotting the Dendrogram
+    dendrogram(z, labels=labels, leaf_rotation=90, leaf_font_size=11)
+    plt.title("Protein Family Tree")
+    plt.xlabel("Proteins")
+    plt.ylabel("Distance")
+    plt.savefig(Checkpoint_2_step_3_family_plot, dpi=400, bbox_inches="tight") #saving dendrogram to server directory
+    print("Dendrogram has been saved to directory as a png!")
+    
+    #Yay! Celebrating that step 3 was able to complete
+    print("Step 3 is Finished! Pursue Step 4")
+
 if __name__ == "__main__":
     main()
