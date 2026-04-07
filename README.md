@@ -81,14 +81,13 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
     checkpoint_1_egfr_predictions_data.csv
     checkpoint_1_feature_importance_data.csv
 
-<<<<<<< HEAD
     ![Terminal sanity check](images/egfr_true_vs_pred.png)
     ![Terminal sanity check](images/r2_value_curve.png)
 =======
 ### Terminal General Sanity Check
 ![Terminal sanity check](images/egfr_true_vs_pred.png)
 ![Terminal sanity check](images/r2_value_curve.png)
->>>>>>> baa249a82a802807675fef73358ddb5094c9b899
+
 
 
 
