@@ -4,7 +4,12 @@
 # Cleans the data, maps and filters it
 # Goal : Keep kinase realated rows 
 # it currently has EGFR rows for later use as test data for transfer learning.
-
+# I followed a few github repositories to construct the code blow.
+#I used links to understand chunkloading and labeling columns, mapping the overall csv file in pd frame.
+#https://www.reddit.com/r/learnpython/comments/13vvmie/pandas_chunk_merge_2_dataframes/
+#https://gist.github.com/cengizhancaliskan/e2aff781378793454b7615cb02745fc7
+#https://github.com/deepchem/deepchem/blob/master/construct_pdbind_df.py
+#https://github.com/deepchem/deepchem/blob/master/examples/binding_pockets/binding_pocket_datasets.py
 
 
 import os
@@ -283,7 +288,7 @@ def main():
         print("Sample Uniprot IDs:")
         print(datafile["uniprot_id"].dropna().head(10).tolist())
     datafile.to_csv(Chckp_1_step1_output_path , index=False)
-    print("Step 1 output saved in",Chckp_1_step1_output_path)
+    print("Yaaay!Step 1 output saved in",Chckp_1_step1_output_path)
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,16 @@
 # ===============
 # Checkpoint-1 Step-3
 # Ligand Features and Final Feature Table (chunked version)
+# Smiles spam is cleaned.
 # =================
+#Work Cited
+# Fingerprint info
+#https://www.rdkit.org/docs/GettingStartedInPython.html
+#https://github.com/mathworks/Chemistry-Molecular-Similarity-Analysis/blob/main/Compute_Fingerprints.py
+#Ligand and overall Rdkit information
+#https://github.com/rdkit/rdkit/blob/master/Docs/Book/GettingStartedInPython.rst
+#This repo has an extensive kinase research dowload available on the botom of the page
+#https://github.com/TangSoftwareLab/KiBA?tab=readme-ov-file
 
 import os
 import warnings 

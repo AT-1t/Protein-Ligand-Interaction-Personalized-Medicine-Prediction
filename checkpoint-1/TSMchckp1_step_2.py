@@ -3,6 +3,15 @@
 # Sequence alignment features Needleman Winsch
 # Use kinase-family referecence to find kinase family realtion
 # we are going to keep all rows splitting is going to happen in step4
+# I tried to follow the code style as class and a few of the 
+# repositories I linked as a reference. 
+#https://biopython.org/docs/1.78/api/Bio.Align.html
+#https://github.com/biopython/biopython/issues/4769
+#https://github.com/scastlara/minineedle/blob/master/minineedle/needle.py
+#https://github.com/scikit-bio/scikit-bio/blob/main/skbio/alignment/_pairwise.py
+# None of the code is copy pasted.I just red and tried follow their styles.
+
+
 
 import os
 import re
@@ -148,7 +157,9 @@ def get_fam_ref_seq(df):
         ref_row = fam_df.sort_values("seq_len", ascending=False).iloc[0]"""
 
 
-   
+#The studied the code below from a github repository
+#https://biopython.org/docs/1.78/api/Bio.Align.html
+#https://github.com/biopython/biopython/issues/4769
 def aligner_build():
     aligner = PairwiseAligner()
     #global allignment from beginig to end not just best matching parts.
@@ -163,6 +174,11 @@ def aligner_build():
     return aligner
 
 #Calculates base pair allignment and exact nidex by index similarity
+
+#I had studied Needleman Wunch in several repositories this are the ones 
+#I sort of implemented part of my code
+#https://github.com/scastlara/minineedle/blob/master/minineedle/needle.py
+#https://github.com/scikit-bio/scikit-bio/blob/main/skbio/alignment/_pairwise.py
 def execute_alignment_features(reference_sequence, query_sequence, aligner):
     query_sequence = sequence_cleanup(query_sequence)
     
@@ -283,8 +299,8 @@ def main():
     reference_data_df = get_fam_ref_seq(df)
     reference_data_df.to_csv(Reference_seq_output, index=False)
 
-    print("Reference kinase families used:", reference_data_df.shape[0])
-    print("Sample reference families:", reference_data_df["kinase_family"].head(10).tolist())
+    print("Yay! Reference kinase families used:", reference_data_df.shape[0])
+    print("Yay! Sample reference families:", reference_data_df["kinase_family"].head(10).tolist())
 
     aligner = aligner_build()
     #Clean up the sequence scores
@@ -292,7 +308,7 @@ def main():
 
     #Executes once per unique sequence to speed up processing
     unique_sequences = df["sequence"].dropna().unique().tolist()
-    print("Unique sequences to score:", len(unique_sequences))
+    print("Done! Unique sequences to score:", len(unique_sequences))
 
     feature_map = {} #this getting created with seq with closest kinase fam,needleamn score,seq similairty --> follow along the code.
     
@@ -326,8 +342,8 @@ def main():
     )
 
     df.to_csv(Checkpoint_1_step_2_output_path, index=False)
-    print("Checkpoint 1 step_2_output_path saved in:", Checkpoint_1_step_2_output_path)
-    print("Final Checkpoint-1 Step-2 shape:", df.shape)
+    print("Checkpoint 1 step_2_output_path happily saved in:", Checkpoint_1_step_2_output_path)
+    print("Hope it is good shape, Checkpoint-1 Step-2 final shape:", df.shape)
 
 if __name__ == "__main__":
     main()
