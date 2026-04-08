@@ -8,17 +8,23 @@ We are going to use datasets such as BindingDB,UniProt,Protein Databank, and Che
 
 ## Server Usage Info
 •To access the server 
+
     ssh tubmu@hpcctl.ocf.berkeley.edu
 •Password
+
     group8chem277B@ucb
 •Activate Environment
+
     source chem277b-env2/bin/activate
 •python file folder
+
      cd new_chem_277b
 •Project output folder
+
     cd New_checkpoint_1_data_here Or
     cd Checkpoint_2_data
 •To get out of the server
+   
     exit
 
 # Checkpoint-1
