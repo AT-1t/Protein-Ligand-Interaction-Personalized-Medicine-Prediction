@@ -152,26 +152,37 @@ Checkpoint_2_data/checkpoint_2_step_2_deepseq_embedding.csv
 - Confirmation of output file saved
 - Final dataframe shape
 
-## Checkpoint-1  Step-3
-Checkpoint-2 Step 3 takes the dataset produced from the previous step <checkpoint_2_step_2_deepseq_embedding.csv> and prepares it for protein classification processes. The goal of this step is to create a clean, protein-level feature table that can be used for machine learning while also visualizing relationships between proteins.
-First, data is cleaned via removing rows with missing or invalid kinase family labels and standardizing the label formatting. Then, non-feature columns such as identifiers, sequences, and raw metadata are removed so that there are only numerical features remaining.
-All feature columns are converted to numeric values, and missing or infinite values are handled in order to ensure compatibility with machine learning models. Next, duplicate protein entries are collapsed by grouping on identifiers such as UniProt ID and kinase family. This also ensures that each protein is being represented by a single row, helping to prevent any biase caused by a ligand having repeated entries.
-Adter building the final protein-level dataset, a dendrogram (hierarchical clustering tree) is generated using Euclidean distance and Ward linkage. The visualization helps to show how proteins might cluster based on their sequeunce-derived and embedding featurrs. This would provide more insight into protein family relationships.
-The final output is a cleaned and reduced dataset along with the saved visualization of protein clusters, which will be used as input for Step 4
+## Checkpoint-2  Step-3
+Checkpoint-2 Step 3 takes the dataset produced from the previous step <checkpoint_2_step_2_deepseq_embedding.csv> and prepares it for protein classification processes. The goal of this step is to create a clean, protein-level feature table that can be used for machine learning while also visualizing relationships between proteins and combining local alignment features using Smith-Waterman.
+First, data is cleaned via removing rows with missing or invalid kinase family labels and standardizing the label formatting. Then, non-feature columns such as identifiers, sequences, and raw metadata are removed so that there are only numerical features remaining. Functions were produced to help determine local alignment features to combine with the global alignment and other features summarized through checkpoints 1 and checkpoint 2 thus far. Once local alignment features are created and added to the dataset, all feature columns are converted to numeric values, and missing or infinite values are handled in order to ensure compatibility with machine learning models. The resulting dataframe is saved for step 3. The rest of step 3 was used to produce some visualizations using dendograms for family and protein subsets, where a protein is being represented by a single row, helping to prevent any over-convolution in the visualization data. After building the final protein-level dataset, a dendrogram (hierarchical clustering tree) is generated using Euclidean distance and Ward linkage. The visualization helps to show how proteins might cluster based on their sequeunce-derived and embedding featurrs. This would provide more insight into protein family relationships.
+The final output is a cleaned dataset now considering local alignments along with the saved visualization of protein clusters, which will be used as input for Step 4.
 
     •nohup python -u checkpoint_2_step_3.py > checkpoinr2_step3_run.log 2>&1 & 
     OR
     •python checkpoint_2_step_3.py
 
     Data Directory: Checkpoint_2_data
-    File saved:
+    Files saved:
     checkpoint_2_step_3_family_classification.csv
-    checkpoint_2_step_3_family_tree.png
+    checkpoint_2_step_3_family_tree_plot.png
+    checkpoint_2_step_3_protein_subset.png
 ### Terminal General Sanity Check
 
+![Terminal sanity check](images/checkpoint_2_step3_sanitycheck_1.png)
+![Terminal sanity check](images/checkpoint_2_step3_sanitycheck_2.png)
+
+The terminal sanity checks show the proper loading of the input dataset to step 3, as well as showing setup and inspection visually throughout the step 3 proceess. It confirms moves to each step, as well as dataframe sizes and feature presence.
+
+### Visual Outputs for Step 3
+
+Within checkpoint 2 step 3, visualization methods were adapted to understand the family classification more visually, as well as experimenting with some basic EDA for understanding. Dendrogram plots were made for families and for protein subsets (though protein subset plot is convoluted and hard to read, but still posted here). UMAP was also experimented with, but from experimentation the conclusion was drawn that the family classifiers do not separate well in feature space, seen by poor separation on UMAP plotting.
+
+![EDA for Checkpoint 2 Step 3](images/checkpoint_2_step_3_family_tree_plot.png)
+
+![EDA for Checkpoint 2 Step 3](images/checkpoint_2_step_3_protein_subset.png)
 
 
-## Checkpoint-1  Step-4
+## Checkpoint-2  Step-4
 Checkpoint-2 Step 4 trains a machine learning model to predict the protein kinase family using the dataset generated in step 3 <checkpoint_2_step_3_family_classification.csv>. This step feocuses on evaluating how well the model can generalize to unseen proteins in a cold-start setting.
 The dataset is first loaded and validated to make sure that the necessary information is present from the step 3 output, such as required labels and features. 
 A cold-start evaluation strategy is applied by splitting the data based on protein identity. Specifically, EGFR proteins are excluded from training and used only for testing. This is ensuring that the model is evaluated on proteins it has not seen before.
@@ -190,7 +201,7 @@ These outputs are able to help analyze the features that are contributing to cla
     •python checkpoint_2_step_4.py
 
     Data Directory: Checkpoint_2_data
-    File saved:
+    Files saved:
     checkpoint_2_step_4_transfer_learning_family_predictions.csv
     checkpoint_2_step_4_family_classification_metrics.csv
     checkpoint_2_step_4_family_classification_confusion_matrix.csv
@@ -203,9 +214,19 @@ These outputs are able to help analyze the features that are contributing to cla
     checkpoint_2_step_4_cvsi.png
     checkpoint_2_step_4_conhist.png
 
-    
-
 ### Terminal General Sanity Check
+
+![Terminal Sanity Check Checkpoint 2 Step 4](images/checkpoint_2_step4_sanitycheck_1.png)
+![Terminal Sanity Check Checkpoint 2 Step 4](images/checkpoint_2_step4_sanitycheck_2.png)
+
+### Visualization Outputs for Model Performance Monitoring
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_feature_importance.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_metrics.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_conhist.png)
+
+These plots, and other print statements and confusion matrices are being used to evaluate how the model is responding to the cold start goal with different hyperparameters and data distributions. Due to the low F1 Macro score and overly high accuracy, the next step is to eliminate the biased class distributions to see if that helps the model generalize more when dealing with unseen proteins. Right now, the model is too comfortable assigning to the most abundant class it knows. Feature importance plotting is also being used to evaluate usefulness of the features in the RF classifier. XGBooster is also being considered/evaluated for model improvement. 
+
+MORE FEATURE ANALYSIS TO BE ADDED - IF THE SERVER WOULD RUN
 
 
 # Checkpoint -3 
