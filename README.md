@@ -121,11 +121,12 @@ The first step in the Checkpoint 2 pipeline addresses the fundamental challenge 
 
 The sequence feature extraction process operates on the output from Checkpoint 1 Step 2, which contains protein sequences aligned against kinase family references along with their corresponding target names and alignment scores. The primary objective is to extract a comprehensive set of features that characterize each protein sequence from multiple perspectives: its amino acid composition, its physicochemical properties, and its structural characteristics. These features collectively provide a multi-faceted representation of each protein that enables downstream classification algorithms to distinguish between different kinase families.
 
-**To run the file (Paul_Rubiro_Checkpoint_2_Step_1):**
+**To run the file (Paul_Rubiro_Checkpoint_2_Step_1):**<br>
 ``
 nohup python -u Paul_Rubiro_checkpoint_2_step_1.py > checkpoint2_step1_run.log 2>&1 &
 ``
-**Output:**
+
+**Output:**<br>
 Checkpoint_2_data/checkpoint_2_step_1_sequence_feature_data.csv
 
 **Log File Output:**
@@ -137,10 +138,10 @@ Checkpoint_2_data/checkpoint_2_step_1_sequence_feature_data.csv
 ## Checkpoint-2  Step-2
 The second step extends the feature extraction process by generating deep sequence embeddings that capture more nuanced patterns within protein sequences. While the composition based features from Step 1 provide valuable information about the overall character of a protein, they do not account for the sequential arrangement of amino acids or position dependent patterns that often carry functional significance. The embedding approach addresses this limitation by encoding each amino acid as a multi-dimensional vector and aggregating these vectors in ways that preserve positional information.
 
-**To run the file:**
+**To run the file:**<br>
 ``nohup python -u Paul_Rubiro_checkpoint_2_step_2.py > checkpoint2_step2_run.log 2>&1 &``
 
-**Output:**
+**Output:**<br>
 Checkpoint_2_data/checkpoint_2_step_2_deepseq_embedding.csv
 
 **Log File Output:**
