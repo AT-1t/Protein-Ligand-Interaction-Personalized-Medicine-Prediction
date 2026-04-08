@@ -116,6 +116,39 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
 
 # Checkpoint-2 
 
+## Checkpoint-2 Step-1
+The first step in the Checkpoint 2 pipeline addresses the fundamental challenge of representing protein sequences as numerical features suitable for machine learning algorithms. Protein sequences, expressed as strings of amino acid letters, must be transformed into quantitative representations that capture biologically relevant properties. This transformation is essential because machine learning models cannot directly process raw sequence data; they require numerical input vectors with consistent dimensionality across all samples.
+
+The sequence feature extraction process operates on the output from Checkpoint 1 Step 2, which contains protein sequences aligned against kinase family references along with their corresponding target names and alignment scores. The primary objective is to extract a comprehensive set of features that characterize each protein sequence from multiple perspectives: its amino acid composition, its physicochemical properties, and its structural characteristics. These features collectively provide a multi-faceted representation of each protein that enables downstream classification algorithms to distinguish between different kinase families.
+
+**To run the file (Paul_Rubiro_Checkpoint_2_Step_1):**
+``
+nohup python -u Paul_Rubiro_checkpoint_2_step_1.py > checkpoint2_step1_run.log 2>&1 &
+``
+**Output:**
+Checkpoint_2_data/checkpoint_2_step_1_sequence_feature_data.csv
+
+**Log File Output:**
+- Number of sequences processed
+- Count of unique sequences identified
+- Confirmation of successful output file creation
+- Final dataframe shape
+
+## Checkpoint-2  Step-2
+The second step extends the feature extraction process by generating deep sequence embeddings that capture more nuanced patterns within protein sequences. While the composition based features from Step 1 provide valuable information about the overall character of a protein, they do not account for the sequential arrangement of amino acids or position dependent patterns that often carry functional significance. The embedding approach addresses this limitation by encoding each amino acid as a multi-dimensional vector and aggregating these vectors in ways that preserve positional information.
+
+**To run the file:**
+``nohup python -u Paul_Rubiro_checkpoint_2_step_2.py > checkpoint2_step2_run.log 2>&1 &``
+
+**Output:**
+Checkpoint_2_data/checkpoint_2_step_2_deepseq_embedding.csv
+
+**Log File Output:**
+- Number of unique sequences to embed
+- Progress bar for embedding generation
+- Confirmation of output file saved
+- Final dataframe shape
+
 ## Checkpoint-1  Step-3
 Checkpoint-2 Step 3 takes the dataset produced from the previous step <checkpoint_2_step_2_deepseq_embedding.csv> and prepares it for protein classification processes. The goal of this step is to create a clean, protein-level feature table that can be used for machine learning while also visualizing relationships between proteins.
 First, data is cleaned via removing rows with missing or invalid kinase family labels and standardizing the label formatting. Then, non-feature columns such as identifiers, sequences, and raw metadata are removed so that there are only numerical features remaining.
