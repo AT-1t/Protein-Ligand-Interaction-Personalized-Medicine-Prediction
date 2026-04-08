@@ -98,17 +98,19 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
     OR
     •python Tuba_Murphy_updated_checkpoint_1_step4.py
     Data Directory:New_checkpoint_1_data_here
-    File saved:
-    checkpoint_1_scaler_data.pkl
-    checkpoint_1_egfr_predictions_data.csv
-    checkpoint_1_feature_importance_data.csv
+    File Saved:
+    ckp1_step4_model_1_egfr_only.pkl
+    ckp1_step4_model_1_egfr_only_scaler.pkl
+    ckp1_step4_model_1_egfr_only_y_scaler.pkl
+    ckp1_step4_model_1_egfr_only_log.tx
 
-    ![Terminal sanity check](images/egfr_true_vs_pred.png)
-    ![Terminal sanity check](images/r2_value_curve.png)
+    Some Addition Visual Outputs:
+    Checkpoint_1_model_1_Egfr_only_validation_curv.png
+
 =======
 ### Terminal General Sanity Check
-![Terminal sanity check](images/egfr_true_vs_pred.png)
-![Terminal sanity check](images/r2_value_curve.png)
+![Terminal sanity check](images/Sanity_Check_ckp1_st4_EGFR_only_model.png)
+
 
 
 
@@ -200,6 +202,8 @@ These outputs are able to help analyze the features that are contributing to cla
     checkpoint_2_step_4_metrics.png
     checkpoint_2_step_4_cvsi.png
     checkpoint_2_step_4_conhist.png
+
+    
 
 ### Terminal General Sanity Check
 
