@@ -3,6 +3,15 @@
 # Sequence alignment features Needleman Winsch
 # Use kinase-family referecence to find kinase family realtion
 # we are going to keep all rows splitting is going to happen in step4
+# I tried to follow the code style as class and a few of the 
+# repositories I linked as a reference. 
+#https://biopython.org/docs/1.78/api/Bio.Align.html
+#https://github.com/biopython/biopython/issues/4769
+#https://github.com/scastlara/minineedle/blob/master/minineedle/needle.py
+#https://github.com/scikit-bio/scikit-bio/blob/main/skbio/alignment/_pairwise.py
+# None of the code is copy pasted.I just red and tried follow their styles.
+
+
 
 import os
 import re
@@ -109,18 +118,15 @@ def get_fam_ref_seq(df):
     else:
         valid_fam = valid_fam.head(max_reference_families).copy() #from valid cases take top N
     
-    reference_rows = []
-
-    for fam in valid_fam["kinase_family"].tolist():
-        fam_df = non_egfr_df[non_egfr_df["kinase_family"] == fam].copy()
-
+    def build_reference_row(fam):
+        fam_df = non_egfr_df[non_egfr_df["kinase_family"] ==fam].copy()
         if fam_df.empty:
-            continue
-        #it chooses the longest clean sequence in each family reference
+            return None
         fam_df["seq_len"] = fam_df["sequence"].str.len()
         ref_row = fam_df.sort_values("seq_len", ascending=False).iloc[0]
 
-        reference_rows.append({
+
+        return {
             "kinase_family": fam,
             "reference_sequence": ref_row["sequence"],
             "reference_length": len(ref_row["sequence"]),
@@ -128,14 +134,32 @@ def get_fam_ref_seq(df):
             "reference_uniprot_id": ref_row["uniprot_id"] if "uniprot_id" in ref_row.index else np.nan,
             "reference_target_name" :ref_row["target_name"] if "target_name" in ref_row.index else np.nan,
 
-        })
+        }
+    
+    reference_rows = list(
+        filter(None, map(build_reference_row, valid_fam["kinase_family"].tolist()))
+    )
 
-    reference_data_df =pd.DataFrame(reference_rows)
+    reference_data_df = pd.DataFrame(reference_rows)
 
     if reference_data_df.empty:
         raise ValueError("No kinase family reference sequences could be built")
-        
-    return reference_data_df
+    return reference_data_df                                
+
+"""
+    for fam in valid_fam["kinase_family"].tolist():
+        fam_df = non_egfr_df[non_egfr_df["kinase_family"] == fam].copy()
+
+        if fam_df.empty:
+            continue
+        #it chooses the longest clean sequence in each family reference
+        fam_df["seq_len"] = fam_df["sequence"].str.len()
+        ref_row = fam_df.sort_values("seq_len", ascending=False).iloc[0]"""
+
+
+#The studied the code below from a github repository
+#https://biopython.org/docs/1.78/api/Bio.Align.html
+#https://github.com/biopython/biopython/issues/4769
 def aligner_build():
     aligner = PairwiseAligner()
     #global allignment from beginig to end not just best matching parts.
@@ -150,6 +174,11 @@ def aligner_build():
     return aligner
 
 #Calculates base pair allignment and exact nidex by index similarity
+
+#I had studied Needleman Wunch in several repositories this are the ones 
+#I sort of implemented part of my code
+#https://github.com/scastlara/minineedle/blob/master/minineedle/needle.py
+#https://github.com/scikit-bio/scikit-bio/blob/main/skbio/alignment/_pairwise.py
 def execute_alignment_features(reference_sequence, query_sequence, aligner):
     query_sequence = sequence_cleanup(query_sequence)
     
@@ -193,22 +222,23 @@ def execute_fam_panel_features(query_sequence, reference_data_df,aligner):
             "mean_sequence_similarity":np.nan,
             "family_reference_count":np.nan
         }
-    scores_list = []
     
-    #Goes through each rough in the dataframe and for each row use its data (ref seq) to make alignment comparison.
-    for _, row in reference_data_df.iterrows(): #_ index in each ro in the dataframe
-        align_raw_score, normalized_score, prefix_similarity = execute_alignment_features(
+    def compute_score(row):
+        align_raw_score, normalized_score, prefix_similarity =execute_alignment_features(
             row["reference_sequence"], query_sequence, aligner
+
         )
-        
-        scores_list.append({
+        return {
             "kinase_family": row["kinase_family"],
             "raw_score": align_raw_score,
             "normalized_score": normalized_score,
             "prefix_similarity": prefix_similarity,
-        })
-
-    scores_list_df = pd.DataFrame(scores_list).dropna()
+        }
+        
+    scores_list_df = pd.DataFrame(
+        list(map(compute_score, reference_data_df.to_dict("records")))
+    ).dropna()
+  
 
     if scores_list_df.empty:
         return {
@@ -248,6 +278,8 @@ def execute_fam_panel_features(query_sequence, reference_data_df,aligner):
 # =======
 
 def main():
+    os.makedirs(Data_directory, exist_ok=True)
+    
     if not os.path.exists(Checkpoint_1_step_1_input_path):
         print("Step-1 file is not found", Checkpoint_1_step_1_input_path)
         return
@@ -267,8 +299,8 @@ def main():
     reference_data_df = get_fam_ref_seq(df)
     reference_data_df.to_csv(Reference_seq_output, index=False)
 
-    print("Reference kinase families used:", reference_data_df.shape[0])
-    print("Sample reference families:", reference_data_df["kinase_family"].head(10).tolist())
+    print("Yay! Reference kinase families used:", reference_data_df.shape[0])
+    print("Yay! Sample reference families:", reference_data_df["kinase_family"].head(10).tolist())
 
     aligner = aligner_build()
     #Clean up the sequence scores
@@ -276,7 +308,7 @@ def main():
 
     #Executes once per unique sequence to speed up processing
     unique_sequences = df["sequence"].dropna().unique().tolist()
-    print("Unique sequences to score:", len(unique_sequences))
+    print("Done! Unique sequences to score:", len(unique_sequences))
 
     feature_map = {} #this getting created with seq with closest kinase fam,needleamn score,seq similairty --> follow along the code.
     
@@ -310,8 +342,8 @@ def main():
     )
 
     df.to_csv(Checkpoint_1_step_2_output_path, index=False)
-    print("Checkpoint 1 step_2_output_path saved in:", Checkpoint_1_step_2_output_path)
-    print("Final Checkpoint-1 Step-2 shape:", df.shape)
+    print("Checkpoint 1 step_2_output_path happily saved in:", Checkpoint_1_step_2_output_path)
+    print("Hope it is good shape, Checkpoint-1 Step-2 final shape:", df.shape)
 
 if __name__ == "__main__":
     main()

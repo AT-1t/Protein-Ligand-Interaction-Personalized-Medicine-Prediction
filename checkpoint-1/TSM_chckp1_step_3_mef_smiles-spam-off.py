@@ -1,7 +1,16 @@
 # ===============
 # Checkpoint-1 Step-3
 # Ligand Features and Final Feature Table (chunked version)
+# Smiles spam is cleaned.
 # =================
+#Work Cited
+# Fingerprint info
+#https://www.rdkit.org/docs/GettingStartedInPython.html
+#https://github.com/mathworks/Chemistry-Molecular-Similarity-Analysis/blob/main/Compute_Fingerprints.py
+#Ligand and overall Rdkit information
+#https://github.com/rdkit/rdkit/blob/master/Docs/Book/GettingStartedInPython.rst
+#This repo has an extensive kinase research dowload available on the botom of the page
+#https://github.com/TangSoftwareLab/KiBA?tab=readme-ov-file
 
 import os
 import warnings 
@@ -124,6 +133,9 @@ def main():
     #it loops through to data to create dictionary from each row
     #it computes molecular features ,fp, descp from smiles  
     #adds in the dataframe we created in step-2 
+    """ for row in tqdm(datafile.itertuples(index=False), total=len(datafile)):
+        fp = ligand_fingerprint(row.smiles_clean)
+        descriptors = ligand_des(row.smiles_clean)""" 
     for _, row in tqdm(datafile.iterrows(), total=len(datafile)):
         fp = ligand_fingerprint(row["smiles_clean"])
         descriptors = ligand_des(row["smiles_clean"])
@@ -151,9 +163,10 @@ def main():
             
         }
 
-        for i in range(len(fp)):
-            row_dict[f"fp_{i}"] = fp[i]
-        output_rows_list.append(row_dict)
+        row_dict.update(dict(map(lambda x: (f"fp_{x[0]}", x[1]), enumerate(fp))))
+        output_rows_list.extend(map(lambda x: x, [row_dict]))
+
+       
 
         ## chcunk saving for memeory usage
         if len(output_rows_list) >= Chunksize:
