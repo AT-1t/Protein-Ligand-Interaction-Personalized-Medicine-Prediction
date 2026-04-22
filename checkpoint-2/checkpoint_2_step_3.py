@@ -37,6 +37,7 @@ Checkpoint_2_step_3_umap = os.path.join(Data_directory, "checkpoint_2_step_3_uma
 
 
 AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWY")
+
 def clean_sequence(seq):
     """
     Cleans a protein sequence so step 3 is only using standard amino acid letters.
@@ -184,7 +185,7 @@ def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=30):
 
 
 
-def adding_local_align_features(df, max_refs_per_family=1):
+def adding_local_align_features(df, ref_df = None, max_refs_per_family=3):
     """
     adding local alighment features to a dataframe
 
@@ -195,6 +196,7 @@ def adding_local_align_features(df, max_refs_per_family=1):
     Returns:
         pd.DataFrame: Original dataframe enriched with local alignment feature columns added
     """
+    df = df.copy()
     #if a cleaned sequence exists, then use that
     if "sequence_clean" in df.columns:
         df["sequence_clean"] = df["sequence_clean"]
@@ -206,8 +208,18 @@ def adding_local_align_features(df, max_refs_per_family=1):
         print("no sequence column found for local alighment features")
         return df
     
+    if ref_df is None:
+        ref_df = df.copy()
+    else:
+        ref_df = ref_df.copy()
+        #if a cleaned sequence exists, then use that
+    if "sequence_clean" in ref_df.columns:
+        ref_df["sequence_clean"] = ref_df["sequence_clean"]
+    #otherwise build a cleaned sequence column from the raw sequence column after cleaning
+    elif "sequence" in ref_df.columns:
+        ref_df["sequence_clean"] = ref_df["sequence"].map(clean_sequence)
     #initializing family reference used for local alignment
-    reference_map = family_reference_sequences(df, max_refs_per_family=3)
+    reference_map = family_reference_sequences(ref_df, max_refs_per_family=max_refs_per_family)
     #print the number of family reference groups that were built
     print("the number of local alightment reference families:", len(reference_map))
 
@@ -360,7 +372,8 @@ def main():
             "local_alignment_mean_normalized",
             "local_alignment_score_std",
             "local_alignment_hit_count",
-            "local_alignment_family_match"]
+            #"local_alignment_family_match"
+            ]
 
     assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"] #not great for cold-start so considering removing!!!!
     feature_columns = embedding_columns + aa_columns + phychem_columns + similarity_columns + local_alighment_columns#+ assay_columns
