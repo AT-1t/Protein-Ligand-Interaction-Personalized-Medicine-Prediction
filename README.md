@@ -62,12 +62,6 @@ These ligand features are then combined with protein similarity features to crea
     File saved:
     checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv
 
-### Terminal General Sanity Check
-![Terminal sanity check](images/sanity_check_ckp1_stp3_1.png)
-
-![Terminal sanity check](images/sanity_check_ckp1_stp3_2.png)
-
-
 Data structure is correct, features complete,values are realistic,missining values minimal(1%) pipeline seems like working perfectly.
 
 
@@ -89,13 +83,6 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
 
     Some Addition Visual Outputs:
     Checkpoint_1_model_1_Egfr_only_validation_curv.png
-
-=======
-### Terminal General Sanity Check
-
-
-
-
 
 
 
