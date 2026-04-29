@@ -25,8 +25,6 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
     File saved:
     checkpoint_1_step_1_kinase_filtered_data.csv
 
-### Terminal General Sanity Check
-![Terminal sanity check](images/sanity_check_ckp1_stp1.png)
 
 #### checkpoint_1_step_1_kinase_filtered_data.csv has 697,865 actual data rows.
 
@@ -42,11 +40,7 @@ Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step
     checkpoint_1_kinase_reference_sequence_data.csv
 
 
-### Terminal General Sanity Check
-![Terminal sanity check](images/sanity_check_ckp1_st2_1.png)
 
-
-![Terminal sanity check](images/sanity_check_ckp1_stp2.png)
 
 
 
