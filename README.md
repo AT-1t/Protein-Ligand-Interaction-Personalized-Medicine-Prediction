@@ -1,30 +1,14 @@
+Abstract 
 
-# Predicting Protein Ligand Ineractions, Family, and Environmental Influence Using Fusion Based Machine Learning Model
+Hypothesis 
 
-This project focuses on predicting interactions between kinase family proteins by analyzing their sequence similarity, kinase ligand interactions, and how these interactions change under different environmental conditions. Kinase family proteins play a crucial role in cell signaling and regulating growth, with their dysregulation being heavily linked to several types of cancer. Unfortunately, current public datasets often lack integrated approaches that account for tissue specific conditions. As a result, they do not fully capture whether a kinase would bind to a ligand in a specific biological context. Our approach constructs on these datasets by integrating protein ligand and enviromental information into a single model to better reflect real world conditions and support more personalized medicine applications.
-Protein features include sequence similairty using Needleman-Wunsch and Smith Waterman motif detection methods. Ligand features are generated from SMILES strings and include properties like hydrophobicity and binding affintiy. These features are combined into a multi-modal machine learning model. The projects is divided into three checkpoints: binding predictions, protein family classifcation, and environmental effects. In the final phase we include factors like pH and tissue specific conditions to better understand how context affects binding. The model ouputs similarity scores, binding affinity, and critical contributing environmental features.
-We use datasets such as BindingDB,UniProt,Protein Databank, and ChemBL across different checkpoints. Our aim is to improve prediction accuracy for unseen kinase proteins by combining biological, chemical and environmental information into a unified framework to create more personalized therapeutics. The model developed in `Checkpoint 1 and 2 will be integrated into a fusion model` to allow personalized medicine strategies for EGFR mutant lung adenocarcinoma.
+Background 
 
-## Server Usage Info
-•To access the server 
 
-    ssh tubmu@hpcctl.ocf.berkeley.edu
-•Password
+Project Design 
 
-    group8chem277B@ucb
-•Activate Environment
 
-    source chem277b-env2/bin/activate
-•python file folder
 
-     cd new_chem_277b
-•Project output folder
-
-    cd New_checkpoint_1_data_here Or
-    cd Checkpoint_2_data
-•To get out of the server
-   
-    exit
 
 # Checkpoint-1
 Chuckpoint 1 creates the full pipeline for predicting protein ligand binding affinity.It starts by loading and filtering the dataset to only include kinase proteins.Then, protein and ligand features are generated separately.Finally, these features are combined into a ANN machine learning model and evaluated EGFR setup and binding analysis. 
@@ -91,7 +75,7 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 ## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
-cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the model only on non-EGFR proteins and then tests it on EGFR to evaluate how well it generalizes to unseen data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
+cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the model only on EGFR proteins only to evaluate how well it generalizes on EGFR data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
 
     •nohup python -u  Tuba_Murphy_updated_checkpoint_1_step4.py > cp1_step_2_for_run.log 2>&1 &
     OR
@@ -108,7 +92,7 @@ cleans and prepares all features, and trains a ANN model to predict binding affi
 
 =======
 ### Terminal General Sanity Check
-![Terminal sanity check](images/Sanity_Check_ckp1_st4_EGFR_only_model.png)
+
 
 
 
