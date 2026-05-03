@@ -195,3 +195,46 @@ MORE FEATURE ANALYSIS TO BE ADDED - IF THE SERVER WOULD RUN
 
 # Checkpoint -3 
 ## Steps
+## Checkpoint-3 Step-1
+### Patient Mutation Dataset Construction
+
+By structing the data at the patient level and encoding mutation presence as features, this step establishes a bridge between traditional molecular modelings and personalized medicine. 
+
+The dataset captured key EGFR mutation types commonly associated with cancer progression and therapeutic response: exon 19, L858R, L861Q, and G719X. Rather than treating EGFR as a uniform target, our dataset could reflect how its behavior varies across individuals, enabling downstream models to incorporate patient-specific biological context for lung adenocarcinoma. The mutation dataset consists of approximately 70 patients, each annotated with EGFR mutation information. 
+
+The data was obtained from the Cancer Genome Altas Program (TCGA) compared with ChemBL to include mutation labels, hotspot indicators, and associated mutation metadata.
+| Feature | Description |
+|--------|------------|
+| `patient_id` | Unique identifier for each patient |
+| `has_exon19del` | Exon 19 deletion mutation indicator (0/1) |
+| `has_L858R` | L858R substitution mutation (0/1) |
+| `has_L861Q` | L861Q mutation (0/1) |
+| `has_G719X` | G719X mutation (0/1) |
+| `has_exon20_alteration` | Exon 20 alteration indicator (0/1) |
+| `mutation_count` | Number of mutations per patient |
+| `is_compound_mutation` | 1 if multiple mutations are present |
+| `is_egfr_hotspot` | Indicates hotspot mutation presence |
+
+---
+
+## Used for future steps
+
+| patient_id | exon19del | L858R | L861Q | G719X | mutation_count | compound |
+|------------|----------|------|------|------|----------------|----------|
+| P001 | 1 | 0 | 0 | 0 | 1 | 0 |
+| P002 | 0 | 1 | 1 | 0 | 2 | 1 |
+| P003 | 0 | 0 | 0 | 1 | 1 | 0 |
+
+---
+
+To prepare the dataset for modeling, mutation strings were parsed and transformed into a structured feature set. Each patient entry was converted into a series of binary indicators representing the presence or absence of key mutation types.
+
+ Additional features were engineered to capture higher-level mutation characteristics, including:
+
+- Mutation count: the total number of mutations observed per patient
+
+
+- Compound mutation indicator: a binary variable denoting whether multiple mutations are present
+
+
+- Hotspot mutation flag: indicating whether the mutation occurs in a clinically significant region
