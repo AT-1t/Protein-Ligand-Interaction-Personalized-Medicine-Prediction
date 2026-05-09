@@ -375,13 +375,13 @@ def main():
             #"local_alignment_family_match"
             ]
 
-    assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"] #not great for cold-start so considering removing!!!!
+    assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"]
     feature_columns = embedding_columns + aa_columns + phychem_columns + similarity_columns + local_alighment_columns#+ assay_columns
     #checking out features and validity using some print statements
     print("\nPossible Feature Columns:")
     print(feature_columns)
     print("Any missing values in features?:", df[feature_columns].isna().sum().sum())
-    #saving the altered datagrame for step 4
+    #saving the altered dataframe for step 4
     df.to_csv(Checkpoint_2_step_3_output_path, index=False)
    
 

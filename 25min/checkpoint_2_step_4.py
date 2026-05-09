@@ -15,6 +15,7 @@ from checkpoint_2_step_3 import adding_local_align_features, clean_sequence
 import os
 import pandas as pd
 import warnings 
+import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GroupShuffleSplit
@@ -40,9 +41,10 @@ Checkpoint_2_metrics_png = os.path.join(Data_directory, "checkpoint_2_step_4_met
 Checkpoint_2_correctness_png = os.path.join(Data_directory, "checkpoint_2_step_4_cvsi.png")
 Checkpoint_2_confidence_pnd = os.path.join(Data_directory, "checkpoint_2_step_4_conhist.png")
 Checkpoint_2_pkl = os.path.join(Data_directory, "checkpoint_2_step_4_transfer_learning_family_predictions.pkl")
+Checkpoint_2_classification = os.path.join(Data_directory, "checkpoint_2_step_4_classification_report_proteins.csv")
+Checkpoint_2_map = os.path.join(Data_directory, "checkpoint_2_step_4_classification_map.png")
 
-
-def saving_confusion_mattrix(cm_df):
+def saving_confusion_mattrix(y_true, y_pred, class_names, normalize=True):
     """
     creates and then saves a confusion matrix to a .png
 
@@ -52,11 +54,18 @@ def saving_confusion_mattrix(cm_df):
     Returns:
         None, instead saves .png file to directory
     """
+    cm = confusion_matrix(y_true, y_pred)
+    cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
+
+
     #initializing confusion matrix with heatmap figure
     plt.figure(figsize=(10,10))
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm_df.values, display_labels=cm_df.columns)
-    disp.plot(cmap="Blues")
+    sns.heatmap(cm_df, cmap="Blues", annot=True, linewidths=0.5)
     plt.title("Step 4 Confusion Matrix")
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    plt.xticks(rotation=45, ha="right")
+    plt.yticks(rotation=0)
     plt.tight_layout()
     plt.savefig(Checkpoint_2_confusion_png, dpi=400)
     plt.close()
@@ -80,6 +89,7 @@ def save_feature_importance(importance_df, top_n=15):
     plt.xlabel("Importance")
     plt.ylabel("Feature")
     plt.title(f"Top {top_n} Feature Importance")
+    plt.tight_layout()
     plt.savefig(Checkpoint_2_importance_png, dpi=400) #saving to png in directory
     plt.close()
 
@@ -94,13 +104,14 @@ def save_metrics_plot(metrics_df):
         None, but saves barplot as .png to directory specified
     """
     #keep only the predictive score metrics
-    plot_df = metrics_df[metrics_df["metric"].isin(["accuracy", "f1", "f1_weighted"])].copy()
+    plot_df = metrics_df[metrics_df["metric"].isin(["accuracy", "f1", "f1_weighted", "f1_micro"])].copy()
     #initializing and creating barplot showing metrics
     plt.figure(figsize=(10,10))
     plt.bar(plot_df["metric"], plot_df["value"])
     plt.ylim(0,1)
     plt.ylabel("Score")
     plt.title("Step 4 Model Performance")
+    plt.tight_layout()
     plt.savefig(Checkpoint_2_metrics_png, dpi=400) #saving to png in server directory
     plt.close()
 
@@ -121,6 +132,7 @@ def save_correct_incorrect_plot(results_df):
     plt.bar(["Incorrect", "Correct"], [counts.get(False, 0), counts.get(True, 0)])
     plt.ylabel("Count")
     plt.title("Prediction Accuracy Breakdown")
+    plt.tight_layout()
     plt.savefig(Checkpoint_2_correctness_png, dpi=400) #saving to a png in the server directory
     plt.close()
 
@@ -143,6 +155,7 @@ def save_confidence_histogram(results_df):
     plt.xlabel("Prediction Confidence")
     plt.ylabel("Counts")
     plt.title("Prediction Confidence Distribution")
+    plt.tight_layout()
     plt.savefig(Checkpoint_2_confidence_pnd, dpi=400) #save to png
     plt.close()
 
@@ -208,8 +221,8 @@ def loading_too_much_data(path, chunksize=50000):
         rows_keep += len(chunk)
         chunks.append(chunk)
 
-        if i % 10 ==0:
-            print(f"chunks read: {i}")
+       # if i % 10 ==0:
+           # print(f"chunks read: {i}")
 
     if not chunks:
         return pd.DataFrame(columns=usecols), base_feature_cols
@@ -304,7 +317,7 @@ def main():
     3. filters for valid protein families
     4. splits data into training with protein holdout
     5. encodes labels for classification using LabelEncoder
-    6. trains a Random Forest Classifier - also exploring XGBoost
+    6. trains a XGB Boost Model- also exploring XGBoost
     7. Evaluates performance using accuracy and f1 scores
     8. saves predictions, metrics, confusion matrix, and feature importance as .csv and .png
     9. generates visualizations for understanding and analysis
@@ -332,10 +345,10 @@ def main():
     df["uniprot_id"] = df["uniprot_id"].astype(str).str.strip()
     df = df[(df["closest_kinase_family"] != "") & (df["uniprot_id"] != "")].copy()
     
-    
+    min_samples = 20
     protein_counting = df[["closest_kinase_family", "uniprot_id"]].drop_duplicates()["closest_kinase_family"].value_counts()
-    valid_families = protein_counting[protein_counting >= 2].index.tolist()
-    df = df[df["closest_kinase_family"].isin(valid_families)].copy()
+    valid_families = protein_counting[protein_counting >= min_samples].index
+    df = df[df["closest_kinase_family"].isin(valid_families)]
     #there must be two families overall
     if df["closest_kinase_family"].nunique() < 2:
         print("Please have at least 2 families for classification!!")
@@ -400,25 +413,56 @@ def main():
     #Setting Up and Training Random Forest Classifier
     #============================================================================================
     weighting_sample = compute_sample_weight("balanced", y_train)
-    xgb_model = RandomForestClassifier(
-        n_estimators=300, 
-        max_depth=20,
-        min_samples_split=5,
-        min_samples_leaf=2,  
-        n_jobs=-1, 
-        random_state=42, 
-        class_weight="balanced_subsample")
+    xgb_model = XGBClassifier(objective="multi:softprob", 
+                             n_estimators=300,
+                            max_depth=5, 
+                             learning_rate=0.03, 
+                          #   subsample=0.7, 
+                           #  colsample_bytree=0.7,
+                            min_child_weight=3,
+                            gamma=0.5,
+                             reg_alpha=2.0, 
+                            reg_lambda=5.0, 
+                             random_state=42, 
+                             n_jobs=-1, 
+                             eval_metric="mlogloss", 
+                             tree_method="hist")
 
     #fitting the model on training data
     xgb_model.fit(X_train, y_train_encoded, sample_weight=weighting_sample)
+    selector = SelectFromModel(xgb_model, threshold="mean", prefit=True)
+    selected = selector.get_support()
+    selected_feature_cols = [f for f, keep in zip(feature_columns, selected) if keep]
 
+    X_train = selector.transform(X_train)
+    X_test = selector.transform(X_test)
+    print("original features:", len(feature_columns))
+    print("selected features:", X_train.shape[1])
+
+    xgb_model_c = XGBClassifier(objective="multi:softprob", 
+                             n_estimators=200,
+                            max_depth=5, 
+                             learning_rate=0.03, 
+                          #   subsample=0.7, 
+                           #  colsample_bytree=0.7,
+                            min_child_weight=3,
+                            gamma=0.5,
+                             reg_alpha=2.0, 
+                            reg_lambda=5.0, 
+                             random_state=42, 
+                             n_jobs=-1, 
+                             eval_metric="mlogloss", 
+                             tree_method="hist")
+
+    #fitting the model on training data
+    xgb_model_c.fit(X_train, y_train_encoded, sample_weight=weighting_sample)
     #measuring the training accuracy to detect overfitting
-    train_pred = xgb_model.predict(X_train).astype(int)
+    train_pred = xgb_model_c.predict(X_train).astype(int)
     train_accuracy = accuracy_score(y_train_encoded, train_pred)
     print("Training Accuracy:", train_accuracy)
 
     #Prediction ofr test labels
-    y_pred = xgb_model.predict(X_test)
+    y_pred = xgb_model_c.predict(X_test)
     current_labels = np.unique(y_test_encoded)
     #Metrics - Accuracy, F1 Macro and F1 Weighted
     #====================================================================
@@ -433,7 +477,7 @@ def main():
     results["true_family"] = y_test.values
     results["predicted_family"] = label_encoder.inverse_transform(y_pred)
     results["prediction_correct"] = (results["true_family"] == results["predicted_family"])
-    pred_prob = xgb_model.predict_proba(X_test)
+    pred_prob = xgb_model_c.predict_proba(X_test)
     results["prediction_confidence"] = pred_prob.max(axis=1)
     prot_results = looking_at_protein_level(results)
     prot_accuracy = accuracy_score(prot_results["true_family"], prot_results["predicted_family"])
@@ -454,8 +498,8 @@ def main():
 
     #Saving Metrics Summary
     #==================================================================================
-    metrics_df = pd.DataFrame({"metric": ["accuracy", "f1", "f1_weighted", "n_train", "n_test", "n_features"], 
-                               "value": [accuracy, f1, f1_weighted, len(X_train), len(X_test), len(feature_columns)]})
+    metrics_df = pd.DataFrame({"metric": ["accuracy", "f1", "f1_weighted", "f1_micro", "n_train", "n_test", "n_features"], 
+                               "value": [accuracy, f1, f1_weighted, f1_micro, len(X_train), len(X_test), len(feature_columns)]})
     metrics_df.to_csv(Checkpoint_2_metrics_path, index=False)
     print(metrics_df)
     print("Step 4 Metrics Have Been Saved!")
@@ -472,12 +516,13 @@ def main():
 
     #Saving Feature Importance
     #====================================================================
-    importance_df = pd.DataFrame({"feature": feature_columns, "importance": xgb_model.feature_importances_}).sort_values("importance", ascending=False)
+    importance_df = pd.DataFrame({"feature": selected_feature_cols, 
+                                  "importance": xgb_model_c.feature_importances_}).sort_values("importance", ascending=False)
     importance_df.to_csv(Checkpoint_2_importance_path, index=False)
 
     #Saving PNGS of Everything Possible
     #===================================
-    saving_confusion_mattrix(cm_df)
+    saving_confusion_mattrix(y_test_encoded, y_pred, class_names)
     save_feature_importance(importance_df, top_n=30)
     save_metrics_plot(metrics_df)
     save_correct_incorrect_plot(results)
@@ -502,7 +547,10 @@ def main():
     print("\nProtein-Level Classification Report:")   
     print(classification_report(prot_results["true_family"], prot_results["predicted_family"], 
                                 zero_division=0))
-
+    report = classification_report(prot_results["true_family"], prot_results["predicted_family"], 
+                                zero_division=0, output_dict=True)
+    report_df = pd.DataFrame(report).transpose()
+    report_df.to_csv(Checkpoint_2_classification)
     print("total rows", len(df))
     print("unique proteins:", df["uniprot_id"].nunique())
 
