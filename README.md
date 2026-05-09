@@ -1,12 +1,55 @@
-Abstract 
+### Pipeline Usage Information for Graders
+This is stepwise transfer learning pipleline, and it contains three models.
+First two models' ouputs fuses to create a more patient mutaion specifci dataset, and eventually Model3 uses this fused data to create a LightGBM model providing binding affinity estmations for each patient ligand pair.Our model currently takes 25 min to run.We are aware of the timeline it takes, so we created two foders for fast and slpow runs.
+Both folders have their Makefile and README to guide you on how to use them.
+The 2 min folder has our Google Drive information for downlaoding the data via zip folder.2min folder is a basic pipeline.It will provide the output pf three modesl and help you run Model 3, and it will create a persoanlized medicine trearment for patients with high binding probability.
 
-Hypothesis 
 
-Background 
+# Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Machine Learning
+
+###### Tuba(Tori) Murphy, Hannah Fino, Paul Rubiro, Ana Barrera-Jauregui, Snigdha Chanduri
+
+## Abstract 
+This project presents an integrated computational framework for the prediction of small-molecule binding affinities
+in Epidermal Growth Factor Receptor (EGFR) kinase mutations associated with lung adenocarcinoma. EGFR plays
+an important role in cell growth and survival, and its mutations can often lead to abnormal activation and drug
+resistance, making accurate binding prediction essential for the development of targeted therapy. In order to tackle
+the limitations of other approaches that rely solely on protein sequence or chemical features, we combine biological,
+chemical, and mutation-specific data into a unified modeling pipeline. Our hypothesis is that a multi-stage fusion
+model that integrates kinase sequence features and ligand chemical properties with profiles of EGFR patient mutations
+can improve the accuracy of binding affinity prediction for specialized therapeutics, creating a reliable framework for
+identifying therapeutic drug candidates for lung adenocarcinoma.
+We used protein-ligand binding data from BindingDB for extracting sequence features, protein similarity measure-
+ments, and ligand chemical properties. Global alignment and local alignment methods were used to improve the feature
+set, capturing both functional and structural similarities across kinase families. A fusion strategy is then applied to
+integrate patient-specific EGFR mutation data with ligand and protein features to enable binding predictions for per-
+sonalized therapies. Machine learning models, including an artificial neural network for general binding affinity and a
+LightGBM regression for patient specific predictions are trained and evaluated with the LightGBM model achieving a
+predictive accuracy of 77%.
+BindingDB Ligand Identifiers 1333, 13453, 13598, 13523, 13538, 13573, 13558, 13353, 13533, and 13448 were found
+to have repeatedly more favorable binding affinity across patient-specific EGFR mutation profiles. This implies that the
+proposed model could act as a screening system to help identify ideal candidates for further chemotherapeutic scaffold
+improvements. Hydroxyethylamine-based inhibitors, statine-like inhibitors and related kinase targeting thiourea or
+pyrimidine derivatives may present promising directions for future EGFR driven lung cancer therapeutic development.
 
 
-Project Design 
 
+
+## Project Design 
+This is a multi-stage feature engineering and transfer learning pipeline where each checkpoint builds on the results of
+the previous one (Alpsoy and Sezerman, 2025). The output of one step becomes the input of the next, expanding
+from molecular features to chemical context to patient level prediction, with sanity checks at every step before moving
+forward. Checkpoint 1 has four steps. It downloads BindingDB kinase and ligand data, builds Needleman−Wunsch global
+sequence alignment features, and combines the protein and chemical features into a singular dataset. Finally, it trains
+a neural network regression model to calculate EGFR binding affinity and executing molecular prediction (log affinity and
+logP) scores. Checkpoint 2 step 1 and step 2 build on the checkpoint 1 protein sequences using composition features and
+BLOSUM62-inspired embeddings. Checkpoint 2 step 3 enhances the feature set further via adding Smith−Waterman
+alignment for sequence representation. Checkpoint 2 step 4 trains a classification model for predicting kinase family using
+the integrated dataset. Checkpoint 3 constructs a combined dataset by fusing EGFR patient mutation profiles (Exon
+19 del, L858R, L861Q, G719X and Exon 20 mutations) with the checkpoint 1 ANN-based ligand binding estimations
+and checkpoint 2 EGFR family classification outputs. LightGBM model is used with the fusion dataset to compute
+personalized drug response for each patient and ligand pair, putting together molecular and biological signals into patient
+level therapeutic insights.
 
 
 
@@ -17,8 +60,7 @@ Chuckpoint 1 creates the full pipeline for predicting protein ligand binding aff
 Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein ligand ineractions data for many types of proteins and then filters it to keep only kinase related entries.Data gets loaded in smaller chunks so it doesn't overload ram.It cleans the data, selects important columns,convets binding values into usable format, and filters the dataset to keep only kinase related rows while marking EGFR for later testing.Finally, it combines all the prepared data and saves a clean kinase specific datset that will be used i the next steps for the project.
 
     
-    •nohup python -u TSM_Upt_checkpoint_1_step_1_gitcopy.py > cp1_step_1_for_run.log 2>&1 & 
-    OR
+    
     •python TSM_Upt_checkpoint_1_step_1_gitcopy.py 
 
     Data Directory:New_checkpoint_1_data_here
@@ -31,8 +73,7 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
 ## Checkpoint-1  Step-2 
 Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step_1_kinase_filtered_data.csv> and compares each protein sequence to reference kinase family sequences using Needleman Wunsh allignment to evaluate similairty. It calculates features like allignment score,normalized similarity, and closest kinase family for each protein.The output is a new dataset with these sequence based features added which will be used for machine learning in Checkpoint-1 step3 and checkpoint-2 step1.
 
-    •nohup python -u TSMchckp1_step_2.py > cp1_step_2_for_run.log 2>&1 &
-    OR
+
     python TSMchckp1_step_2.py 
     Data Directory:New_checkpoint_1_data_here
     File saved:()
@@ -49,8 +90,7 @@ Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step
 Checkpoint-1 step-3 takes dataset from step2 <checkpoint_1_step_2_alignment_features_data.csv> and converts SMILES strings into numerical features like molecular fingerprints and chemical properties ie.molecular weight, hydrophobicity.This crucial beacuse machine learning models cannot use raw SMILES strings, so we transform them into numbers that provides ligand structure and behavior.
 These ligand features are then combined with protein similarity features to create a final dataset that allows the model to learn and predict protein ligand binding affinity.
 
-    •nohup python -u TSM_chckp1_step_3_mef_smiles-spam-off.py > cp1_step_2_for_run.log 2>&1 &
-    OR
+
     •python TSM_chckp1_step_3_mef_smiles-spam-off.py 
     Data Directory:New_checkpoint_1_data_here
     File saved:
