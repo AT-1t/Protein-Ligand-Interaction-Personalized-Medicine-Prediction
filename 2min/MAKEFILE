@@ -1,0 +1,23 @@
+#2min formated pipeline
+all: 
+    python3 checkpoint3_lightgbm.py
+    python3 create_top10_xlxs.py
+
+
+visualize-mac:
+    @echo "Previous models graphs presented as png files in this folder"
+    open   egfr_only_ann_model_1_output.png
+    open   kinase_family_dendogram_1.png
+    open   kinase_family_dendogram_2.png
+    
+visualize-linux:
+    @echo "Previous models graphs presented as png files in this folder"
+    xdg-open   egfr_only_ann_model_1_output.png || true
+    xdg-open   kinase_family_dendogram_1.png  ||true
+    xdg-open   kinase_family_dendogram_2.png ||true
+    
+visualize-windows:
+    @echo "Previous models graphs presented as png files in this folder"
+    start   egfr_only_ann_model_1_output.png
+    start   kinase_family_dendogram_1.png
+    start   kinase_family_dendogram_2.png

@@ -1,0 +1,31 @@
+## To run this pipeline under 2 min 
+Download the data folders from Google Drive and run the project
+
+#### To run checkpoint3 (LightGBM +Excel output)
+
+</> Bash 
+make
+
+This is going to run the LightGBM (model-3) which build on the previous two models ouputs'. It is also going to create an Excel file containing the top ten highest binding affinity small molecules which are predicted to bind to specific patients who carry those mutations.
+
+##### To visualize project outputs
+All visualizaton results are already included in the folder as png files.
+
+### Visaulization for Mac users
+</> Bash 
+make visualize-mac 
+
+### Visaulization for Linux 
+
+make visualize-linux
+
+### Visaulization for Windows 
+
+make visualize-windows
+
+
+
+
+
+
+
