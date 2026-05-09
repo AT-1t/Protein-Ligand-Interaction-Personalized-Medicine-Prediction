@@ -1,0 +1,29 @@
+# Environment necessary to run this pipeline
+
+
+
+### To run this pipeline full pipeline
+
+</> Bash 
+make
+
+### To run checkpoint 1
+
+</> Bash 
+make checkpoint1
+
+### To run checkpoint 2
+
+</> Bash 
+make checkpoint2
+
+### To run checkpoint 2
+
+</> Bash 
+make checkpoint3
+
+
+
+
+
+
