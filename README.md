@@ -1,11 +1,11 @@
 ### Pipeline Usage Information for Graders
 This is stepwise transfer learning pipleline, and it contains three models.
-First two models' ouputs fuses to create a more patient mutaion specifci dataset, and eventually Model3 uses this fused data to create a LightGBM model providing binding affinity estmations for each patient ligand pair.Our model currently takes 25 min to run.We are aware of the timeline it takes, so we created two foders for fast and slpow runs.
+First two models' ouputs fuses to create a more patient mutaion specific dataset, and eventually Model3 uses this fused data to create a LightGBM model providing binding affinity estmations for each patient ligand pair.Our model currently takes 25 min to run.We are aware of the timeline it takes, so we created two foders for fast and slow runs.
 Both folders have their Makefile and README to guide you on how to use them.
-The 2 min folder has our Google Drive information for downlaoding the data via zip folder.2min folder is a basic pipeline.It will provide the output pf three modesl and help you run Model 3, and it will create a persoanlized medicine trearment for patients with high binding probability.
+The 2 min folder has our Google Drive information for downlaoding the data via zip folder.2min folder is a basic pipeline only includes the alst steps.It will provide the output of three models; it will help graders run Model 3, it will create a personalized proxy medicine treatment for patients with theoratical high binding probability.
 
 
-# Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Machine Learning
+# Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Proxy Machine Learning
 
 ###### Tuba(Tori) Murphy, Hannah Fino, Paul Rubiro, Ana Barrera-Jauregui, Snigdha Chanduri
 
@@ -54,7 +54,7 @@ level therapeutic insights.
 
 
 # Checkpoint-1
-Chuckpoint 1 creates the full pipeline for predicting protein ligand binding affinity.It starts by loading and filtering the dataset to only include kinase proteins.Then, protein and ligand features are generated separately.Finally, these features are combined into a ANN machine learning model and evaluated EGFR setup and binding analysis. 
+Chuckpoint 1 creates the a baseline for full pipeline for predicting protein ligand binding affinity.It starts by loading and filtering the dataset to only include kinase proteins.Then, protein and ligand features are generated separately.Finally, these features are combined into a ANN machine learning model and evaluated EGFR setup and binding analysis. 
 
 ## Checkpoint-1  Step-1 
 Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein ligand ineractions data for many types of proteins and then filters it to keep only kinase related entries.Data gets loaded in smaller chunks so it doesn't overload ram.It cleans the data, selects important columns,convets binding values into usable format, and filters the dataset to keep only kinase related rows while marking EGFR for later testing.Finally, it combines all the prepared data and saves a clean kinase specific datset that will be used i the next steps for the project.
