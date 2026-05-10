@@ -1,6 +1,6 @@
 """
 All kinase data.Weights added and EGFR oversampled."
-I will add references later.
+I will add set up later.
 
 
 
