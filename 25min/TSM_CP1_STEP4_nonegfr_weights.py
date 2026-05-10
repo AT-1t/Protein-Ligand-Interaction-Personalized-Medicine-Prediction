@@ -1,6 +1,9 @@
 """
 All kinase data.Weights added and EGFR oversampled."
 I will add set up later.
+3 hidden layers --> 
+early stopping -->
+debugging -->
 
 
 
