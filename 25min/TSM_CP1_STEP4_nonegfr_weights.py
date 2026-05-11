@@ -205,7 +205,8 @@ class SGradientD_Optimizer:
             self.current_learning_rate *factor
         ) 
 #Learning_rate_pat = Learning_rate_pat
-class EgfrregressorANN:
+#I had to change the class name to kinase after addding all the dataset
+class KinaseEgfrWeightedANN:
     def __init__(
             self,
             input_dim,
@@ -677,7 +678,7 @@ def main():
     X_test = np.nan_to_num(X_test, nan=0.0, posinf=0.0, neginf= 0.0).astype(np.float32)
     
 
-    Model_1_Egfr_w = EgfrregressorANN(
+    Model_1_Egfr_w = KinaseEgfrWeightedANN(
             input_dim =X_train.shape[1],
             hidden_units=(Hidden_unit_1, Hidden_unit_2, Hidden_unit_3),
             learning_rate = Learning_rate,
