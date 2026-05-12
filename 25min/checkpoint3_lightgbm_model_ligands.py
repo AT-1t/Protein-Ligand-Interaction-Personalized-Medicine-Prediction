@@ -11,25 +11,27 @@ import lightgbm as lgb
 # Load data
 # =============================================================================
 
-file_path = "checkpoint3_lightgbm_train_final.parquet"
+file_path = "checkpoint3_fusion_lightgbm_sample_1M.parquet"
 output_dir = "checkpoint_3_ann_outputs"
 os.makedirs(output_dir, exist_ok=True)
 
 print("Loading from:", file_path)
 df = pd.read_parquet(file_path)
 
+target_col = "model_1_binding_pred" 
+
 
 print("Loaded shape:", df.shape)
-print("Target column exists:", "binding_affinity_y" in df.columns)
-print("Target nulls:", df["binding_affinity_y"].isna().sum())
+print("Target column exists:", target_col in df.columns)
+print("Target nulls:", df[target_col].isna().sum())
 
 # =============================================================================
 # Separate y and X
 # =============================================================================
-y = df["binding_affinity_y"].copy()
+y = df[target_col].copy()
 
 drop_cols = [
-    "binding_affinity_y",
+    target_col,
     "patient_id",
     "ligand_row_id",
     "fusion_row_id",
