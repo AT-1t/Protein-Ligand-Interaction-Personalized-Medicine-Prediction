@@ -268,4 +268,9 @@ The final outputs generated from this notebook were designed specifically for do
 ## Checkpoint-3 Step-3
 ### LightGBM 
 
+Two LightGBM regression models were compared to evaluate whether ligand chemistry improved EGFR binding affinity prediction. The baseline model used only mutation-derived and patient molecular features, while the second model incorporated ligand descriptors derived from ChEMBL SMILES structures, including molecular weight, LogP, hydrogen bond features, and molecular fingerprints.
 ![LightGBM Modelings with Ligands](images/with_ligand_top20_feature_importance.png)
+
+When ligand chemistry was included, the predictions clustered more tightly around the diagonal line, indicating improved agreement between predicted and true binding affinities. In contrast, the model without ligand chemistry showed greater spread and deviation from the ideal prediction line, particularly at lower and higher affinity ranges. This suggests that incorporating molecular descriptors helped the model better capture chemical factors influencing EGFR inhibitor interactions.
+![LightGBM Modelings with Ligands](images/true_vs_pred_with_ligand_chemistry.png)
+![LightGBM Modelings with Ligands](images/true_vs_pred_without_ligand_chemistry.png)
