@@ -267,4 +267,5 @@ The final outputs generated from this notebook were designed specifically for do
 
 ## Checkpoint-3 Step-3
 ### LightGBM 
+
 ![LightGBM Modelings with Ligands](images/with_ligand_top20_feature_importance.png)
