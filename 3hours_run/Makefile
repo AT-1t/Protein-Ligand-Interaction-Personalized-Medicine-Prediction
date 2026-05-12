@@ -8,28 +8,28 @@ all: checkpoint1 checkpoint2 checkpoint3
 # ------
 Checkpoint1:
 	@echo "Running Checkpoint 2h 25 min"
-	python cp1_step_1.py
-	python cp1_step_2.py
-	python cp1_step_3.py
-	python cp1_step_4.py
+	python3 cp1_step_1.py
+	python3 cp1_step_2.py
+	python3 cp1_step_3.py
+	python3 cp1_step_4.py
 
 # ----
 # Checkpoint 2(Step 1-4)
 # ------
 Checkpoint2:
 	@echo "Running Checkpoint 10 min"
-	python cp2_step_1.py
-	python cp2_step_2.py
-	python cp2_step_3.py
-	python cp2_step_4.py
+	python3 cp2_step_1.py
+	python3 cp2_step_2.py
+	python3 cp2_step_3.py
+	python3 cp2_step_4.py
 
 # ----
 # Checkpoint 3(Step 2-4)
 # ------
 Checkpoint3:
 	@echo "Running Checkpoint 4, min"
-	python cp3_step_2.py
-	python cp3_step_3.py
+	python3 cp3_step_2.py
+	python3 cp3_step_3.py
 
 
 
