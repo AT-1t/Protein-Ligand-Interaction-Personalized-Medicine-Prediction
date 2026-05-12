@@ -181,7 +181,7 @@ The terminal sanity checks show the proper loading of the input dataset to step 
 
 Within checkpoint 2 step 3, visualization methods were adapted to understand the family classification more visually, as well as experimenting with some basic EDA for understanding. Dendrogram plots were made for families and for protein subsets (though protein subset plot is convoluted and hard to read, but still posted here). UMAP was also experimented with, but from experimentation the conclusion was drawn that the family classifiers do not separate well in feature space, seen by poor separation on UMAP plotting.
 
-![EDA for Checkpoint 2 Step 3](images/checkpoint_2_step_3_family_tree_plot.png)
+![EDA for Checkpoint 2 Step 3](images/checkpoint_2_step_3_family_tree_plot_2.png)
 
 ![EDA for Checkpoint 2 Step 3](images/checkpoint_2_step_3_protein_subset.png)
 
@@ -224,14 +224,13 @@ These outputs are able to help analyze the features that are contributing to cla
 ![Terminal Sanity Check Checkpoint 2 Step 4](images/checkpoint_2_step4_sanitycheck_2.png)
 
 ### Visualization Outputs for Model Performance Monitoring
-![Model Performance Monitoring Results](images/checkpoint_2_step_4_feature_importance.png)
-![Model Performance Monitoring Results](images/checkpoint_2_step_4_metrics.png)
-![Model Performance Monitoring Results](images/checkpoint_2_step_4_conhist.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_feature_importance_2.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_metrics_2.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_conhist_2.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_confusion_matrix_2.png)
+![Model Performance Monitoring Results](images/checkpoint_2_step_4_cvsi_2.png)
 
 These plots, and other print statements and confusion matrices are being used to evaluate how the model is responding to the cold start goal with different hyperparameters and data distributions. Due to the low F1 Macro score and overly high accuracy, the next step is to eliminate the biased class distributions to see if that helps the model generalize more when dealing with unseen proteins. Right now, the model is too comfortable assigning to the most abundant class it knows. Feature importance plotting is also being used to evaluate usefulness of the features in the RF classifier. XGBooster is also being considered/evaluated for model improvement. 
-
-MORE FEATURE ANALYSIS TO BE ADDED - IF THE SERVER WOULD RUN
-
 
 # Checkpoint -3 
 ## Checkpoint-3 Step-1
