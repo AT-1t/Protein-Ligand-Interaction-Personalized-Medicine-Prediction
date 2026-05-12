@@ -7,28 +7,30 @@ all: checkpoint1 checkpoint2 checkpoint3
 # Checkpoint 1(Step 1-4)
 # ------
 Checkpoint1:
-    @echo "Running Checkpoint 1  ,12 min"
-    python TSM_Upt_checkpoint_1_step_1_gitcopy.py
-    python TSMchckp1_step_2.py
-    python TSM_chckp1_step_3_mef_smiles.py
-    python TSM_ckp1_step4_EGFR_ANN_mef_debugged.py
+    @echo "Running Checkpoint 2h 25 min"
+    python cp1_step_1.py
+    python cp1_step_2.py
+    python cp1_step_3.py
+    python cp1_step_4.py
 
 # ----
 # Checkpoint 2(Step 1-4)
 # ------
 Checkpoint2:
-     @echo "Running Checkpoint 2  , min"
-     python Paul_Rubiro_checkpoint_2_step_1.py
-     python Paul_Rubiro_checkpoint_2_step_2.py
-     python checkpoint_2_step_3.py
-     python checkpoint_2_step_4.py
+     @echo "Running Checkpoint 10 min"
+     python cp2_step_1.py
+     python cp2_step_2.py
+     python cp2_step_3.py
+     python cp2_step_4.py
 
 # ----
 # Checkpoint 3(Step 2-4)
 # ------
 Checkpoint3:
-    @echo "Running Checkpoint 3  , min"
-    python checkpoint_3_part1.py
+    @echo "Running Checkpoint 4, min"
+    python cp3_step_1.py
+    python cp3_step_2.py
+    python cp3_step_3.py
 
 
 
