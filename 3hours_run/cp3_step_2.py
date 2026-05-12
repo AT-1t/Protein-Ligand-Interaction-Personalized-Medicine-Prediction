@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-from TSM_CP1_STEP4_nonegfr_weights import KinaseEgfrWeightedANN
+from cp1_step_4 import KinaseEgfrWeightedANN
 
 warnings.filterwarnings("ignore")
 

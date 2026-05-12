@@ -25,7 +25,7 @@ import pickle
 warnings.filterwarnings("ignore")
 
 DIRECTORY ="New_checkpoint_1_data_here"
-INPUT_PATH = os.path.join(DIRECTORY, "cleaned_step3.csv")
+INPUT_PATH = os.path.join(DIRECTORY, "checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv") #cleaned_step3.csv"
 
 Model_1_Egfr_w_path = os.path.join(DIRECTORY,"ckp1_step4_model_1_egfr_only.pkl")
 Scale_ckp1_step4_egfr_only_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_only_scaler.pkl")

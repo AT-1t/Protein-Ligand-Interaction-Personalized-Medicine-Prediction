@@ -11,7 +11,7 @@ This Includes:
     - visualization of model performance
 """
 #Importing necessary libraries
-from checkpoint_2_step_3 import adding_local_align_features, clean_sequence
+from cp2_step_3 import adding_local_align_features, clean_sequence
 import os
 import pandas as pd
 import warnings 
