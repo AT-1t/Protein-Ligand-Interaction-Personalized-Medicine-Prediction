@@ -234,7 +234,6 @@ MORE FEATURE ANALYSIS TO BE ADDED - IF THE SERVER WOULD RUN
 
 
 # Checkpoint -3 
-## Steps
 ## Checkpoint-3 Step-1
 ### Patient Mutation Dataset Construction
 
@@ -257,24 +256,14 @@ The data was obtained from the Cancer Genome Altas Program (TCGA) compared with 
 
 ---
 
-## Used for future steps
+The masterdata.ipynb notebook serves as the central data integration and preprocessing stage for the EGFR personalized drug-response modeling pipeline. In this step, multiple biological and chemical datasets were consolidated into a unified machine-learning-ready framework. Patient-derived molecular data from CPTAC and TCGA were combined with ligand activity and structural information collected from ChEMBL in order to model how EGFR mutation environments may influence inhibitor binding behavior. The notebook organizes mutation profiles, RNA expression, protein abundance, phosphoproteomic signaling activity, and ligand descriptors into a consistent format that can later be used for predictive modeling.
 
-| patient_id | exon19del | L858R | L861Q | G719X | mutation_count | compound |
-|------------|----------|------|------|------|----------------|----------|
-| P001 | 1 | 0 | 0 | 0 | 1 | 0 |
-| P002 | 0 | 1 | 1 | 0 | 2 | 1 |
-| P003 | 0 | 0 | 0 | 1 | 1 | 0 |
+To achieve this, several data cleaning and normalization procedures were applied across the different sources. TCGA mutation records were parsed and converted into structured mutation features, while CPTAC protein, RNA, and phosphosite datasets were reshaped and standardized to allow patient-level comparisons. Duplicate patient identifiers were removed, missing values were filtered, and mutation categories were encoded into machine-readable representations. On the chemical side, ligand binding records and SMILES-derived molecular descriptors were cleaned and merged to preserve biologically relevant drug information. These steps ensured compatibility between datasets originating from different experimental platforms and repositories.
 
----
+A major objective of the notebook was constructing the patient_ligand.csv dataset, which acts as the bridge between biological patient information and ligand chemistry. This fused dataset pairs patient-specific EGFR mutation features with ligand molecular descriptors and estimated binding behavior, enabling downstream machine learning models to learn relationships between mutation environments and drug response. By integrating both biological variability and chemical variability into a single table, the pipeline moves beyond traditional ligand-only prediction approaches and toward a simplified representation of personalized medicine workflows.
 
-To prepare the dataset for modeling, mutation strings were parsed and transformed into a structured feature set. Each patient entry was converted into a series of binary indicators representing the presence or absence of key mutation types.
-
- Additional features were engineered to capture higher-level mutation characteristics, including:
-
-- Mutation count: the total number of mutations observed per patient
+The final outputs generated from this notebook were designed specifically for downstream regression modeling using LightGBM. After feature engineering and dataset fusion, the resulting master datasets were cleaned, standardized, and exported into modeling-ready CSV files. These outputs were later used to train predictive models capable of estimating log binding affinity and evaluating how mutation-driven biological context may alter inhibitor interactions with EGFR.
 
 
-- Compound mutation indicator: a binary variable denoting whether multiple mutations are present
-
-
-- Hotspot mutation flag: indicating whether the mutation occurs in a clinically significant region
+## Checkpoint-3 Step-3
+### LightGBM 
