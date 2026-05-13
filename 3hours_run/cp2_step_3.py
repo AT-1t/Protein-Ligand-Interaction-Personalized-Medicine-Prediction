@@ -25,7 +25,8 @@ warnings.filterwarnings("ignore")
 from scipy.cluster.hierarchy import linkage, dendrogram
 from sklearn.preprocessing import StandardScaler
 import umap
-from Bio import pairwise2
+#from Bio import pairwise2
+from Bio.Align import PairwiseAligner
 
 #Setting up directory, input and output
 Data_directory = "Checkpoint_2_data"
@@ -37,6 +38,7 @@ Checkpoint_2_step_3_umap = os.path.join(Data_directory, "checkpoint_2_step_3_uma
 
 
 AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWY")
+
 
 def clean_sequence(seq):
     """
@@ -59,8 +61,6 @@ def clean_sequence(seq):
 
     #return the cleaned sequence if non-empty; otherwise it will return none
     return seq if seq else None
-
-
 
 
 def family_reference_sequences(df, max_refs_per_family=1):
@@ -107,10 +107,14 @@ def family_reference_sequences(df, max_refs_per_family=1):
 
 
 
+LOCAL_ALIGNER = PairwiseAligner()
+LOCAL_ALIGNER.mode = "local"
+LOCAL_ALIGNER.match_score = 2
+LOCAL_ALIGNER.mismatch_score = -1
+LOCAL_ALIGNER.open_gap_score = -1
+LOCAL_ALIGNER.extend_gap_score = -1
 
-
-
-def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=30):
+def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=40):
     """
     For summarizing local alighment scores for one sequence vs family references
 
@@ -138,9 +142,8 @@ def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=30):
         }
     
     #SMITH WATERMAN SCORE
-    #using pairwise2 which is imported from Biopython and functions are smith waterman
     #Computing one numpy score array per family by aligning the query to that family's references
-    family_scoring = {family: np.array([pairwise2.align.localms(seq, ref_seq, 2, -1, -1, -1, score_only=True) for ref_seq in refs], dtype=float)
+    family_scoring = {family: np.array([LOCAL_ALIGNER.score(seq, ref_seq) for ref_seq in refs], dtype=float)
                       for family, refs in reference_map.items() if refs}
 
     #keeping only the families that produced at least one alignment score total
@@ -169,7 +172,8 @@ def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=30):
     best_score = float(all_scoring.max())
     #compute the mean score across all family reference comparisons
     mean_score = float(all_scoring.mean())
-
+   # print("score statistics:", np.min(all_scoring), np.mean(all_scoring), np.max(all_scoring))
+    #print("percentiles", np.percentile(all_scoring, 90), np.percentile(all_scoring, 95))
     #returning the summary feature dictionary for this sequence
     return {
             "local_alignment_best_score": best_score,
@@ -180,9 +184,6 @@ def computing_local_alignment_feats_seq(seq, reference_map, hit_threshold=30):
             "local_alignment_hit_count": int((all_scoring >= hit_threshold).sum()),
             "local_alignment_best_match_family": best_family
         }
-
-
-
 
 
 def adding_local_align_features(df, ref_df = None, max_refs_per_family=3):
@@ -283,7 +284,6 @@ def data_housekeeping_helper(df, feature_columns):
     #return the cleaned numeric feature matric as dataframe
     return X_df
 
-
 def main():
     #File Validations and Reading
     #============================================
@@ -292,7 +292,6 @@ def main():
         print("NO Step 3 Input File Was Found!")
         return
     
-
     #Reading input file
     df = pd.read_csv(Checkpoint_2_step_3_input_path)
     print("Step 3 Input File Successfully Loaded!")
@@ -314,8 +313,6 @@ def main():
     print("Top 5 Family Counts:")
     print(df["closest_kinase_family"].value_counts().head())
 
-
-
     #Some File Housekeeping
     #===========================================
     #removing rows where the protein family label might be missing
@@ -329,7 +326,6 @@ def main():
         print("No good family labels present")
         return
     
-
     df = adding_local_align_features(df)
     #print shape after adding local alignment features
     print("Shape:", df.shape)
@@ -339,7 +335,6 @@ def main():
     print("File Has uniprot_id:", "uniprot_id" in df.columns)
 
     print("Step 3 Input File Passed Cleaning and Checks")
-
 
     #Data Preparations
     #=================================================
@@ -375,13 +370,13 @@ def main():
             #"local_alignment_family_match"
             ]
 
-    assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"]
+    assay_columns = ["ki", "kd", "ic50", "affinity", "log_affinity"] #not great for cold-start so considering removing!!!!
     feature_columns = embedding_columns + aa_columns + phychem_columns + similarity_columns + local_alighment_columns#+ assay_columns
     #checking out features and validity using some print statements
     print("\nPossible Feature Columns:")
     print(feature_columns)
     print("Any missing values in features?:", df[feature_columns].isna().sum().sum())
-    #saving the altered dataframe for step 4
+    #saving the altered datagrame for step 4
     df.to_csv(Checkpoint_2_step_3_output_path, index=False)
    
 
@@ -399,21 +394,19 @@ def main():
     X_family_scaled = scaler_fam.fit_transform(X_family)
     #computing the ward-linkage hierarchical clustering on scaled data
     z = linkage(X_family_scaled, method="ward")
-    plt.figure(figsize=(20,20))
+    plt.figure(figsize=(30,20))
     labels = family_df["closest_kinase_family"].astype(str).tolist()
     
     #Plotting the Dendrogram
-    dendrogram(z, labels=labels, leaf_rotation=45, leaf_font_size=10)
-    plt.title("Hierarchical Clustering of Kinase Families")
-    plt.xlabel("Kinase Family")
-    plt.ylabel("Distance")
+    dendrogram(z, labels=labels, orientation="right", leaf_font_size=25, color_threshold=10)
+    plt.title("Hierarchical Clustering of Kinase Families", fontsize=50)
+    plt.xlabel("Distance", fontsize=50)
+    plt.ylabel("Kinase Family", fontsize=50)
     plt.tight_layout()
     plt.savefig(Checkpoint_2_step_3_family_dend_plot, dpi=400) #saving dendrogram to server directory
     plt.close()
     print("\nFamily Dendrogram PNG Saved to Directory!")
     
-
-
     #Attempt at Completing a Protein Level Subset Dendrogram
     #===========================================================================================
     if "uniprot_id" in df.columns:
@@ -435,10 +428,10 @@ def main():
         
         #initializing figure and then building dendrogram
         plt.figure(figsize=(30,30))
-        dendrogram(Z_protein, labels=labels, leaf_rotation=90, leaf_font_size=6)
-        plt.title("Clustering of Protein Subset by Family")
-        plt.xlabel("Proteins")
-        plt.ylabel("Distance")
+        dendrogram(Z_protein, labels=labels, leaf_rotation=90, leaf_font_size=25)
+        plt.title("Clustering of Protein Subset by Family", fontsize=40)
+        plt.xlabel("Proteins", fontsize=40)
+        plt.ylabel("Distance", fontsize=40)
         plt.tight_layout()
         plt.savefig(Checkpoint_2_step_3_protein_dend_plot, dpi=400) #saving dendrogram to server directory
         plt.close()
