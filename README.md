@@ -61,7 +61,7 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
 
     
     
-    •python TSM_Upt_checkpoint_1_step_1_gitcopy.py 
+    •python cp1_step_1.py 
 
     Data Directory:New_checkpoint_1_data_here
     File saved:
@@ -74,7 +74,7 @@ Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein 
 Checkpoint-1 Step-2 takes the cleaned kinase data from step-1 <checkpoint_1_step_1_kinase_filtered_data.csv> and compares each protein sequence to reference kinase family sequences using Needleman Wunsh allignment to evaluate similairty. It calculates features like allignment score,normalized similarity, and closest kinase family for each protein.The output is a new dataset with these sequence based features added which will be used for machine learning in Checkpoint-1 step3 and checkpoint-2 step1.
 
 
-    python TSMchckp1_step_2.py 
+    python cp1_step_2.py 
     Data Directory:New_checkpoint_1_data_here
     File saved:()
     checkpoint_1_step_2_alignment_features_data.csv
@@ -91,7 +91,7 @@ Checkpoint-1 step-3 takes dataset from step2 <checkpoint_1_step_2_alignment_feat
 These ligand features are then combined with protein similarity features to create a final dataset that allows the model to learn and predict protein ligand binding affinity.
 
 
-    •python TSM_chckp1_step_3_mef_smiles-spam-off.py 
+    •python cp1_step_3.py  
     Data Directory:New_checkpoint_1_data_here
     File saved:
     checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv
@@ -103,20 +103,21 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 ## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
-cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the model only on EGFR proteins only to evaluate how well it generalizes on EGFR data.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
+cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the kinase proteins to evaluate how well the model generalizes across kinase families while maintainig EGFR  realted prediction performance.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
 
-    •nohup python -u  Tuba_Murphy_updated_checkpoint_1_step4.py > cp1_step_2_for_run.log 2>&1 &
+    •nohup python -u  cp1_step_4.py > cp1_step_2_for_run.log 2>&1 &
     OR
-    •python Tuba_Murphy_updated_checkpoint_1_step4.py
+    •python cp1_step_4.py
     Data Directory:New_checkpoint_1_data_here
     File Saved:
-    ckp1_step4_model_1_egfr_only.pkl
-    ckp1_step4_model_1_egfr_only_scaler.pkl
-    ckp1_step4_model_1_egfr_only_y_scaler.pkl
-    ckp1_step4_model_1_egfr_only_log.tx
+    ckp1_step4_model_1_egfr_weights.pkl
+    ckp1_step4_model_1_egfr_weights_scaler.pkl
+    ckp1_step4_model_1_egfr_weights_y_scaler.pkl
+
+
 
     Some Addition Visual Outputs:
-    Checkpoint_1_model_1_Egfr_only_validation_curv.png
+   ![KINASE EGFR WEIGHTED ANN MODEL](images/Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png)
 
 
 
@@ -129,7 +130,7 @@ The sequence feature extraction process operates on the output from Checkpoint 1
 
 **To run the file (Paul_Rubiro_Checkpoint_2_Step_1):**<br>
 ``
-nohup python -u Paul_Rubiro_checkpoint_2_step_1.py > checkpoint2_step1_run.log 2>&1 &
+nohup python -u  cp2_step_1.py. > cp2_step1_run.log 2>&1 &
 ``
 
 **Output:**<br>
@@ -161,7 +162,7 @@ Checkpoint-2 Step 3 takes the dataset produced from the previous step <checkpoin
 First, data is cleaned via removing rows with missing or invalid kinase family labels and standardizing the label formatting. Then, non-feature columns such as identifiers, sequences, and raw metadata are removed so that there are only numerical features remaining. Functions were produced to help determine local alignment features to combine with the global alignment and other features summarized through checkpoints 1 and checkpoint 2 thus far. Once local alignment features are created and added to the dataset, all feature columns are converted to numeric values, and missing or infinite values are handled in order to ensure compatibility with machine learning models. The resulting dataframe is saved for step 3. The rest of step 3 was used to produce some visualizations using dendograms for family and protein subsets, where a protein is being represented by a single row, helping to prevent any over-convolution in the visualization data. After building the final protein-level dataset, a dendrogram (hierarchical clustering tree) is generated using Euclidean distance and Ward linkage. The visualization helps to show how proteins might cluster based on their sequeunce-derived and embedding featurrs. This would provide more insight into protein family relationships.
 The final output is a cleaned dataset now considering local alignments along with the saved visualization of protein clusters, which will be used as input for Step 4.
 
-    •nohup python -u checkpoint_2_step_3.py > checkpoinr2_step3_run.log 2>&1 & 
+    •nohup python -u  cp2_step_3.py> cp2_step3_run.log 2>&1 & 
     OR
     •python checkpoint_2_step_3.py
 
@@ -199,7 +200,7 @@ Prediction Confidence Distribution
 
 These outputs are able to help analyze the features that are contributing to classification while also showing how well the model is generalizing under the protein-holdout conditions.
 
-    •nohup python -u checkpoint_2_step_4.py > checkpoinr2_step4_run.log 2>&1 & 
+    •nohup python -u  cp2_step_4.py > cp2_step4_run.log 2>&1 & 
     OR
     •python checkpoint_2_step_4.py
 
@@ -261,6 +262,26 @@ To achieve this, several data cleaning and normalization procedures were applied
 A major objective of the notebook was constructing the patient_ligand.csv dataset, which acts as the bridge between biological patient information and ligand chemistry. This fused dataset pairs patient-specific EGFR mutation features with ligand molecular descriptors and estimated binding behavior, enabling downstream machine learning models to learn relationships between mutation environments and drug response. By integrating both biological variability and chemical variability into a single table, the pipeline moves beyond traditional ligand-only prediction approaches and toward a simplified representation of personalized medicine workflows.
 
 The final outputs generated from this notebook were designed specifically for downstream regression modeling using LightGBM. After feature engineering and dataset fusion, the resulting master datasets were cleaned, standardized, and exported into modeling-ready CSV files. These outputs were later used to train predictive models capable of estimating log binding affinity and evaluating how mutation-driven biological context may alter inhibitor interactions with EGFR.
+
+## Checkpoint -3 Step-2
+### Fusion Step 
+This code loads and cleans patient mutation data together with kinase ligand feature data, then uses the pretrained ANN model1 to generate proxy binding afinity predictions for kinase related ligands.The ANN x_scaler normalizes all numerical input features before prediction, while the y_scaler converts ANN ouput values back into original binding affinity score ranges for easier biological meaning.
+
+Next, the code merges patient mutation profiles with ligand feature tables 
+by using a Cartesain join, which creates every possible patient ligand combination for personalized predictiom modeling.Additional interaction features are thrn generated between ANN predicted binding afinity scores and EGFR realted mutation variables to preapre the final fusion dataset for downstream LightGBM modeling.
+
+         •nohup python -u  cp3_step_2.py > cp3_step2_run.log 2>&1 & 
+        OR
+        •python cp3_step_2.py
+
+        Data Directory: Checkpoint_3_data
+        Files saved:
+
+        checkpoint3_patient_clean.parquet
+        checkpoint1_kinase_weighted_feature_table.parquet
+        checkpoint2_predictions_clean.parquet
+        checkpoint3_fusion_lightgbm_ready.parquet
+
 
 
 ## Checkpoint-3 Step-3
