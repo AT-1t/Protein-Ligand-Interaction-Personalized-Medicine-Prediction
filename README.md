@@ -104,7 +104,7 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 ## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
-cleans and prepares features, and trains an ANN model to predict binding affinity across kinase proteins while evaluating how well the model generalizes across kinase families while mainitaing EGFR related prediction performance.The ANN model was trained on 574,440 total kinase protein rows, including 24,652 EGFR rows, where EGFR samples in the trainning set were oversampled from 15,646 to 31,292 rows to improve EGFR realted learning while still maintaining generalization across kinase families.The final model achieved validation R^2 score of 0.614, a test R^2 score of 0.601, ans test RMSE of 0.9215, and the ouput inlcudes EGFR predictions, feature importance scores, and saved files for the trained model and scaler.
+cleans and prepares features, and trains an ANN model to predict binding affinity across kinase proteins while evaluating how well the model generalizes across kinase families while mainitaing EGFR related prediction performance.The ANN model was trained on 574,440 total kinase protein rows, including 24,652 EGFR rows, where EGFR samples in the trainning set were oversampled from 15,646 to 31,292 rows to improve EGFR realted learning while still maintaining generalization across kinase families.The final model achieved validation R^2 score of 0.614, a test R^2 score of 0.600, ans test RMSE of 0.9215, and the ouput inlcudes EGFR predictions, feature importance scores, and saved files for the trained model and scaler.
 
     •nohup python -u  cp1_step_4.py > cp1_step_2_for_run.log 2>&1 &
     OR
