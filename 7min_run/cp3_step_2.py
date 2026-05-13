@@ -1,6 +1,14 @@
 """ 
 
-This applies a regression ann model scalers, no softamx is neccessary.
+
+
+This applies a regression ann model scalers, prediction and inverse scaling to the 
+checkpoint 1 feature table to create a new feature column with the ann's predicted binding affinity 
+score for each ligand. This is going to be used as a feature in the fusion model.
+I had an issue importing the ann model first, that's why beging of the code is messy.
+It works.
+I chaged the directories for the input files.
+they are in base directory in the server under 7min_run folder.
 
 
 """
