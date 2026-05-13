@@ -1,22 +1,21 @@
-#2min formated pipeline
-ProxyModel: 
-    python3 cp3_step_2.py
-    python3 cp3_step_3.py
+ProxyModel:
+	python3 cp3_step_2.py
+	python3 cp3_step_3.py
 
 visualize-mac:
-    @echo "Previous models graphs presented as png files in this folder"
-    open   Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png
-    open   checkpoint_2_step_3_family_tree_plot_2.png
-    open   comparison_residual_distribution.png
+	@echo "Previous models graphs presented as png files in this folder"
+	open   Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png
+	open   checkpoint_2_step_3_family_tree_plot_2.png
+	open   comparison_residual_distribution.png
     
 visualize-linux:
-    @echo "Previous models graphs presented as png files in this folder"
-    xdg-open  Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png || true
-    xdg-open   checkpoint_2_step_3_family_tree_plot_2.png ||true
-    xdg-open   comparison_residual_distribution.png ||true
+	@echo "Previous models graphs presented as png files in this folder"
+	xdg-open  Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png || true
+	xdg-open   checkpoint_2_step_3_family_tree_plot_2.png ||true
+	xdg-open   comparison_residual_distribution.png ||true
     
 visualize-windows:
-    @echo "Previous models graphs presented as png files in this folder"
-    start   Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png
-    start   checkpoint_2_step_3_family_tree_plot_2.png
-    start   comparison_residual_distribution.png
+	@echo "Previous models graphs presented as png files in this folder"
+	start   Checkpoint_1_model_1_kinase_protein_egfr_weighted_validation_new_curv.png
+	start   checkpoint_2_step_3_family_tree_plot_2.png
+	start   comparison_residual_distribution.png
