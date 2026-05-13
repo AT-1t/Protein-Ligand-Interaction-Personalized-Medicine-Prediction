@@ -3,7 +3,7 @@ This is stepwise transfer learning pipleline, and it contains three models.
 The outputs from the first two models are fused to create a more patient mutation specific dataset.
 Then, Model3 uses this fused data to create a LightGM model that provides a proxy binding affinity estimations for each patient ligand pair.Our model currently takes 2 hours 45 min to run, so we created two folders for fast and slow runs.Both folders have their own Makfile and README files to guide users on how to run them.
 The 7min_run folder includes our server information for usage.It builds a LightGBM proxy model using the datasets created by the previous models.The fusion datset is quite large and has 48M rows, so LightGBM uses 1M rows from it to build personalized proxy medince treatment prediction for patients with theoretically high binding probabilty.
-The 3hours_run folder has the full pipeline, and README explains how to run it.Since this is an ANN model that runs on numpy arrays, even GPU usage would be slow for this run because it goes over nearmly 700,000 rows for 1800 epochs. Our previous model was based on EGFR only ANN, and it only took 15 minutes to run.However, due to circularization concerns in the fusion step, we had to expand the model's generalization across kinase proteins, so the final pipeline takes forever (2h,45min) ti run.
+The 3hours_run folder has the full pipeline, and README explains how to run it.Since this is an ANN model that runs on numpy arrays, even GPU usage would be slow for this run because it goes over nearmly 700,000 rows for 1800 epochs. Our previous model was based on EGFR only ANN, and it only took 15 minutes to run.However, due to circularization concerns in the fusion step, we had to expand the model's generalization across kinase proteins, so the final pipeline takes forever (2h,45min) to run.Please be careful when movin around directories, since this is a stepwise transfer learning pipeline the directory order is crucial.
 
 # Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Proxy Machine Learning
 
@@ -58,7 +58,7 @@ level therapeutic insights.
 Chuckpoint 1 creates the a baseline for full pipeline for predicting protein ligand binding affinity.It starts by loading and filtering the dataset to only include kinase proteins.Then, protein and ligand features are generated separately.Finally, these features are combined into a ANN machine learning model and evaluated EGFR setup and binding analysis. 
 
 ## Checkpoint-1  Step-1 
-Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein ligand ineractions data for many types of proteins and then filters it to keep only kinase related entries.Data gets loaded in smaller chunks so it doesn't overload ram.It cleans the data, selects important columns,convets binding values into usable format, and filters the dataset to keep only kinase related rows while marking EGFR for later testing.Finally, it combines all the prepared data and saves a clean kinase specific datset that will be used i the next steps for the project.
+Checkpoint-1 step1 downloads the full BindingDB dataset, which contains protein ligand ineractions data for many types of proteins and then filters it to keep only kinase related entries.Data gets loaded in smaller chunks so it doesn't overload ram.It cleans the data, selects important columns,convets binding values into usable format, and filters the dataset to keep only kinase related rows while marking EGFR for later testing.Finally, it combines all the prepared data and saves a clean kinase specific datset that will be used i the next steps for the project.Sanity checks were completed for nan values, missing columns, and terminal outputs were saved in images.
 
     
     
@@ -104,7 +104,7 @@ Data structure is correct, features complete,values are realistic,missining valu
 
 ## Checkpoint-1  Step-4
 This code takes the final dataset from step3 <checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv>
-cleans and prepares all features, and trains a ANN model to predict binding affinity.It trains the kinase proteins to evaluate how well the model generalizes across kinase families while maintainig EGFR  realted prediction performance.The output includes predictions for EGFR, feature importance scores, and saved files for the trained model and scaler.
+cleans and prepares features, and trains an ANN model to predict binding affinity across kinase proteins while evaluating how well the model generalizes across kinase families while mainitaing EGFR related prediction performance.The ANN model was trained on 574,440 total kinase protein rows, including 24,652 EGFR rows, where EGFR samples in the trainning set were oversampled from 15,646 to 31,292 rows to improve EGFR realted learning while still maintaining generalization across kinase families.The final model achieved validation R^2 score of 0.614, a test R^2 score of 0.601, ans test RMSE of 0.9215, and the ouput inlcudes EGFR predictions, feature importance scores, and saved files for the trained model and scaler.
 
     •nohup python -u  cp1_step_4.py > cp1_step_2_for_run.log 2>&1 &
     OR

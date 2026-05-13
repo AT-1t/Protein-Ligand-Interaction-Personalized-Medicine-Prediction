@@ -534,7 +534,7 @@ class KinaseEgfrWeightedANN:
             if pred_val_nan > 0 or pred_val_inf > 0:
                 line = (
                     f" epoch {epoch}  val r2: skipped  val rmse:skipped"
-                    f" pred_val contains nan = {pred_train_nan} inf:{pred_val_inf}"
+                    f" pred_val contains nan = {pred_val_nan} inf:{pred_val_inf}"
                 )
                 self.log_lines+= [line]
                 print(line, flush =True)
@@ -842,7 +842,7 @@ def main():
     ax4.set_title("Final RMSE Comparsion")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(DIRECTORY, "Checkpoint_1_egfr_only_ann_model1_graphs.png"))
+    plt.savefig(os.path.join(DIRECTORY, "Checkpoint_1_kinase_egfr_weightedann_model1_graphs.png"))
     plt.close()
 
     with open(Model_1_Egfr_w_path, "wb") as f:
