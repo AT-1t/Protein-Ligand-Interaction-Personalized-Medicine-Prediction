@@ -1,9 +1,9 @@
 ### Pipeline Usage Information for Graders
 This is stepwise transfer learning pipleline, and it contains three models.
-First two models' ouputs fuses to create a more patient mutaion specific dataset, and eventually Model3 uses this fused data to create a LightGBM model providing binding affinity estmations for each patient ligand pair.Our model currently takes 25 min to run.We are aware of the timeline it takes, so we created two foders for fast and slow runs.
-Both folders have their Makefile and README to guide you on how to use them.
-The 2 min folder has our Google Drive information for downlaoding the data via zip folder.2min folder is a basic pipeline only includes the alst steps.It will provide the output of three models; it will help graders run Model 3, it will create a personalized proxy medicine treatment for patients with theoratical high binding probability.
-
+The outputs from the first two models are fused to create a more patient mutation specific dataset.
+Then, Model3 uses this fused data to create a LightGM model that provides a proxy binding affinity estimations for each patient ligand pair.Our model currently takes 2 hours 45 min to run, so we created two folders for fast and slow runs.Both folders have their own Makfile and README files to guide users on how to run them.
+The 7min_run folder includes our server information for usage.It builds a LightGBM proxy model using the datasets created by the previous models.The fusion datset is quite large and has 48M rows, so LightGBM uses 1M rows from it to build personalized proxy medince treatment prediction for patients with theoretically high binding probabilty.
+The 3hours_run folder has the full pipeline, and README explains how to run it.Since this is an ANN model that runs on numpy arrays, even GPU usage would be slow for this run because it goes over nearmly 700,000 rows for 1800 epochs. 
 
 # Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Proxy Machine Learning
 
@@ -17,20 +17,21 @@ resistance, making accurate binding prediction essential for the development of 
 the limitations of other approaches that rely solely on protein sequence or chemical features, we combine biological,
 chemical, and mutation-specific data into a unified modeling pipeline. Our hypothesis is that a multi-stage fusion
 model that integrates kinase sequence features and ligand chemical properties with profiles of EGFR patient mutations
-can improve the accuracy of binding affinity prediction for specialized therapeutics, creating a reliable framework for
-identifying therapeutic drug candidates for lung adenocarcinoma.
-We used protein-ligand binding data from BindingDB for extracting sequence features, protein similarity measure-
-ments, and ligand chemical properties. Global alignment and local alignment methods were used to improve the feature
-set, capturing both functional and structural similarities across kinase families. A fusion strategy is then applied to
-integrate patient-specific EGFR mutation data with ligand and protein features to enable binding predictions for per-
-sonalized therapies. Machine learning models, including an artificial neural network for general binding affinity and a
-LightGBM regression for patient specific predictions are trained and evaluated with the LightGBM model achieving a
-predictive accuracy of 77%.
-BindingDB Ligand Identifiers 1333, 13453, 13598, 13523, 13538, 13573, 13558, 13353, 13533, and 13448 were found
-to have repeatedly more favorable binding affinity across patient-specific EGFR mutation profiles. This implies that the
-proposed model could act as a screening system to help identify ideal candidates for further chemotherapeutic scaffold
-improvements. Hydroxyethylamine-based inhibitors, statine-like inhibitors and related kinase targeting thiourea or
-pyrimidine derivatives may present promising directions for future EGFR driven lung cancer therapeutic development.
+can improve the accuracy of proxy predicted binding affinity for specialized therapeutics, creating a somewhat good
+framework for identifying therapeutic drug candidates for lung adenocarcinoma.
+We used protein-ligand binding data from BindingDB for extracting sequence features, protein similarity mea-
+surements, and ligand chemical properties. Global alignment and local alignment methods were used to improve the
+feature-set, capturing both functional and structural similarities across kinase families. A fusion strategy is then applied
+to integrate patient-specific EGFR mutation data with ligand and protein features to enable binding predictions for
+personalized therapies. Machine learning models, including an artificial neural network for general binding affinity and
+a proxy LightGBM regression for patient specific predictions, are trained and evaluated with the LightGBM model
+achieving a predictive accuracy of 86%.
+BindingDB Ligand Identifiers 37291, 37292, 37089, 37086, 37284, 37283, 618652, 37305, 27852, and 27853 were found
+to have repeatedly more favorable proxy binding affinity predictions across patient-specific EGFR mutation profiles.
+This implies that the proposed proxy binding model could act as a screening system to help identify ideal candidates
+for further chemotherapeutic scaffold improvements. Benzothiophene phenol analogs, thienopyrimidine kinase inhibitor
+analogs and genistein derivatives may present promising future directions in therapeutic development for EGFR-driven
+lung cancer.
 
 
 
@@ -146,7 +147,7 @@ Checkpoint_2_data/checkpoint_2_step_1_sequence_feature_data.csv
 The second step extends the feature extraction process by generating deep sequence embeddings that capture more nuanced patterns within protein sequences. While the composition based features from Step 1 provide valuable information about the overall character of a protein, they do not account for the sequential arrangement of amino acids or position dependent patterns that often carry functional significance. The embedding approach addresses this limitation by encoding each amino acid as a multi-dimensional vector and aggregating these vectors in ways that preserve positional information.
 
 **To run the file:**<br>
-``nohup python -u Paul_Rubiro_checkpoint_2_step_2.py > checkpoint2_step2_run.log 2>&1 &``
+``nohup python -u cp2_step_2.py > cp2_step_2_run.log 2>&1 &``
 
 **Output:**<br>
 Checkpoint_2_data/checkpoint_2_step_2_deepseq_embedding.csv
@@ -271,7 +272,7 @@ Next, the code merges patient mutation profiles with ligand feature tables
 by using a Cartesain join, which creates every possible patient ligand combination for personalized predictiom modeling.Additional interaction features are thrn generated between ANN predicted binding afinity scores and EGFR realted mutation variables to preapre the final fusion dataset for downstream LightGBM modeling.
 
          •nohup python -u  cp3_step_2.py > cp3_step2_run.log 2>&1 & 
-        OR
+         OR
         •python cp3_step_2.py
 
         Data Directory: Checkpoint_3_data
@@ -291,5 +292,10 @@ Two LightGBM regression models were compared to evaluate whether ligand chemistr
 ![LightGBM Modelings with Ligands](images/with_ligand_top20_feature_importance.png)
 
 When ligand chemistry was included, the predictions clustered more tightly around the diagonal line, indicating improved agreement between predicted and true binding affinities. In contrast, the model without ligand chemistry showed greater spread and deviation from the ideal prediction line, particularly at lower and higher affinity ranges. This suggests that incorporating molecular descriptors helped the model better capture chemical factors influencing EGFR inhibitor interactions.
+          •nohup python -u  cp3_step_3.py > cp3_step3_run.log 2>&1 & 
+           OR
+         •python cp3_step_3.py
+
+
 ![LightGBM Modelings with Ligands](images/true_vs_pred_with_ligand_chemistry.png)
 ![LightGBM Modelings with Ligands](images/true_vs_pred_without_ligand_chemistry.png)
