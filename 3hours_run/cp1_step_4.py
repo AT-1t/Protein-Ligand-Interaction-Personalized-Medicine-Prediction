@@ -32,10 +32,10 @@ warnings.filterwarnings("ignore")
 DIRECTORY ="New_checkpoint_1_data_here"
 INPUT_PATH = os.path.join(DIRECTORY, "checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv") #cleaned_step3.csv"
 
-Model_1_Egfr_w_path = os.path.join(DIRECTORY,"ckp1_step4_model_1_egfr_only.pkl")
-Scale_ckp1_step4_egfr_only_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_only_scaler.pkl")
-Y_scale_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_only_y_scaler.pkl")
-log_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_only_log.txt")
+Model_1_Egfr_w_path = os.path.join(DIRECTORY,"ckp1_step4_model_1_egfr_weights.pkl")
+Scale_ckp1_step4_egfr_only_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_weights_scaler.pkl")
+Y_scale_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_weights_y_scaler.pkl")
+log_path = os.path.join(DIRECTORY, "ckp1_step4_model_1_egfr_weights_log.txt")
 
 #I ran and stop this ann over 100 times with different paramters.
 #this one seesm to work best for all kinase data.
