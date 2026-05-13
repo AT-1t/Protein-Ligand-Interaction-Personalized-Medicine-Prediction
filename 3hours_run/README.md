@@ -22,12 +22,6 @@ We already have all these libraries installed in the chem277b-env2 environment o
         conda install -c conda-forge rdkit
 
 
-
-
-pip install numpy pandas matplotlib scikit-learn scipy seaborn tqdm biopython umap-learn xgboost pyarrow requests
-
-conda install -c conda-forge rdkit
-
 ## Running the Full Pipeline
 This is stepwise transfer learning pipeline, so it will run through three checkpoints.We laready have the folder on the server with all the files, and we have already done multiple trials.
 
