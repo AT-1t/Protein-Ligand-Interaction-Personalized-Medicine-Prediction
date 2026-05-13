@@ -12,6 +12,13 @@ This must be run on the server becuase it requires large datafiles generated in 
 
 This will run step of checkpoint3 step2, which combines the Kinase EGFR Weighted ANN Model1 and XGBoost Family Classifaction Model2 datasets with patient mutation data.It then executes the LightGBM Model 3, which builds on ANN binding affinity predictions .There is also an pdf file in the directory containing the top ten highest binding affinity small molecules predicted to bind to specific patients who carry those mutations.
 
+Data Files below are in  7min_run folder in hpcc server.
+                
+                checkpoint_3_patient_mutation_data.csv 
+                checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv
+                checkpoint_2_step_4_transfer_learning_family_predictions.csv
+
+they are all in the 7min_run folder.
 
 #### To run checkpoint3 (LightGBM +Excel output)
 

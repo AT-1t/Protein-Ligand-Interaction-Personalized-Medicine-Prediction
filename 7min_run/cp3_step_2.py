@@ -201,9 +201,10 @@ OUTPUT_DIRECTORY = os.path.join(BASE_DIRECTORY, "fused_data")
 
 os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
 
-CP3_PATIENT_PATH =os.path.join(CP3_DIR, "checkpoint_3_patient_mutation_data.csv")
-CP1_STEP3_PATH = os.path.join(CP1_DIR, "checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv")
-CP2_PRED_PATH = os.path.join(CP2_DIR, "checkpoint_2_step_4_transfer_learning_family_predictions.csv")
+#they are in the base directory for the 7min run, it is in the server 7min_run folder.
+CP3_PATIENT_PATH =os.path.join(BASE_DIRECTORY, "checkpoint_3_patient_mutation_data.csv")
+CP1_STEP3_PATH = os.path.join(BASE_DIRECTORY, "checkpoint_1_step_3_No_smiles_spam_feature_table_data.csv")
+CP2_PRED_PATH = os.path.join(BASE_DIRECTORY, "checkpoint_2_step_4_transfer_learning_family_predictions.csv")
 
 
 #This is the new kinase update paths/ nedd to check the naming before run
