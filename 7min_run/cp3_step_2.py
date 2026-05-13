@@ -187,7 +187,9 @@ class KinaseEgfrWeightedANN:
 
         return self.out.output
 EgfrregressorANN = KinaseEgfrWeightedANN # I will change this later naming issue in the previous file ann doesn't link 
-    
+#this piplene is build on all kinase ann modle
+# I created. my all kinase model witht he previosu egfr model chnage all trainn gtest splits 
+# but i forgot to chnage name i the previous files  
   
         #predictions = self.forward(
        
