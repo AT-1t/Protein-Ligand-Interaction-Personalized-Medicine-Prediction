@@ -187,10 +187,9 @@ Within checkpoint 2 step 3, visualization methods were adapted to understand the
 
 
 ## Checkpoint-2  Step-4
-Checkpoint-2 Step 4 trains a machine learning model to predict the protein kinase family using the dataset generated in step 3 <checkpoint_2_step_3_family_classification.csv>. This step feocuses on evaluating how well the model can generalize to unseen proteins in a cold-start setting.
+Checkpoint-2 Step 4 trains a machine learning model to predict the protein kinase family using the dataset generated in step 3 <checkpoint_2_step_3_family_classification.csv>. This step focuses on evaluating how well the model can generalize to unseen proteins.
 The dataset is first loaded and validated to make sure that the necessary information is present from the step 3 output, such as required labels and features. 
-A cold-start evaluation strategy is applied by splitting the data based on protein identity. Specifically, EGFR proteins are excluded from training and used only for testing. This is ensuring that the model is evaluated on proteins it has not seen before.
-Feature columns are separated from the metadata, and all of the values are converted to numeric format with missing values handled appropriately. The target variable, kinase family, is encoded into numerical labels for model training. A Random Forest Classifier is trained using class-balanced weighting to account for a vast difference in family sizes and the model then predicts protein family labels on the unseen test set of EGFR prteins. Model performance is being evaluated using Accuracy, Macro F1 Score, Weighted F1 Score, and a Confusion Matrix.
+Feature columns are separated from the metadata, and all of the values are converted to numeric format with missing values handled appropriately. The target variable, kinase family, is encoded into numerical labels for model training. A XGBoost Classifier is trained using class-balanced weighting to account for a vast difference in family sizes and the model then predicts protein family labels on the unseen test set of EGFR prteins. Model performance is being evaluated using Accuracy, Macro F1 Score, Weighted F1 Score, and a Confusion Matrix.
 Additional visualizations have been generated to help better understand the behavior of the mode;. This includes the following:
 Confusion Matrix (saved as PNG)
 Feature Importance Plot (top 20-30 contributing features)
@@ -198,7 +197,7 @@ Performance Metrics Bar Chart
 Prediction Correctness Breakdown
 Prediction Confidence Distribution
 
-These outputs are able to help analyze the features that are contributing to classification while also showing how well the model is generalizing under the cold-starting conditions.
+These outputs are able to help analyze the features that are contributing to classification while also showing how well the model is generalizing under the protein-holdout conditions.
 
     •nohup python -u checkpoint_2_step_4.py > checkpoinr2_step4_run.log 2>&1 & 
     OR
@@ -230,7 +229,7 @@ These outputs are able to help analyze the features that are contributing to cla
 ![Model Performance Monitoring Results](images/checkpoint_2_step_4_confusion_matrix_2.png)
 ![Model Performance Monitoring Results](images/checkpoint_2_step_4_cvsi_2.png)
 
-These plots, and other print statements and confusion matrices are being used to evaluate how the model is responding to the cold start goal with different hyperparameters and data distributions. Due to the low F1 Macro score and overly high accuracy, the next step is to eliminate the biased class distributions to see if that helps the model generalize more when dealing with unseen proteins. Right now, the model is too comfortable assigning to the most abundant class it knows. Feature importance plotting is also being used to evaluate usefulness of the features in the RF classifier. XGBooster is also being considered/evaluated for model improvement. 
+These plots, and other print statements and confusion matrices are being used to evaluate how the model is responding to the protein-holdout goal with different hyperparameters and data distributions. Due to the lower testing accuracy and overly high accuracy, the next step would be to work on the moderate overfitting occuring with this model, as well as investigate different ways of handing the protein-holdout or protein representations. This model was able to achieve consistent F1 scoring betwee Macro and Weighted, suggesting that weighting the samples and eliminating under-represented groups were key for balancing the metrics. Working on generalizing the model to under-represented proteins would also be the future direction once overfitting was eliminated.
 
 # Checkpoint -3 
 ## Checkpoint-3 Step-1
