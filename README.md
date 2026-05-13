@@ -3,7 +3,7 @@ This is stepwise transfer learning pipleline, and it contains three models.
 The outputs from the first two models are fused to create a more patient mutation specific dataset.
 Then, Model3 uses this fused data to create a LightGM model that provides a proxy binding affinity estimations for each patient ligand pair.Our model currently takes 2 hours 45 min to run, so we created two folders for fast and slow runs.Both folders have their own Makfile and README files to guide users on how to run them.
 The 7min_run folder includes our server information for usage.It builds a LightGBM proxy model using the datasets created by the previous models.The fusion datset is quite large and has 48M rows, so LightGBM uses 1M rows from it to build personalized proxy medince treatment prediction for patients with theoretically high binding probabilty.
-The 3hours_run folder has the full pipeline, and README explains how to run it.Since this is an ANN model that runs on numpy arrays, even GPU usage would be slow for this run because it goes over nearmly 700,000 rows for 1800 epochs. 
+The 3hours_run folder has the full pipeline, and README explains how to run it.Since this is an ANN model that runs on numpy arrays, even GPU usage would be slow for this run because it goes over nearmly 700,000 rows for 1800 epochs. Our previous model was based on EGFR only ANN, and it only took 15 minutes to run.However, due to circularization concerns in the fusion step, we had to expand the model's generalization across kinase proteins, so the final pipeline takes forever (2h,45min) ti run.
 
 # Predicting Protein–Ligand Interactions, Family, and Mutation Influence Using Multi-Modal Proxy Machine Learning
 
